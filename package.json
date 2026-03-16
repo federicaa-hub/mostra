@@ -1,0 +1,11 @@
+{
+  "name": "mostra-seed",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "firebase": "^10.12.0"
+  }
+}

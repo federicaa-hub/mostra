@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>La Tribu Mostra · Carta</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="menu-header">
+    <div class="header-logo-wrap">
+      <img
+        class="header-logo"
+        src="assets/logo.png"
+        alt="La Tribu Mostra"
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='inline-flex';"
+      >
+      <span id="logo-fallback" class="header-logo-fallback" style="display:none">🌈</span>
+    </div>
+    <div class="header-sub">Centro Cultural</div>
+    <h1 class="header-title">LA TRIBU MOSTRA</h1>
+    <div class="header-tagline">carta · menú</div>
+  </header>
+
+  <div class="rainbow-bar"></div>
+
+  <!-- Category tabs -->
+  <nav class="category-nav" role="tablist">
+    <button class="cat-tab active" data-cat="bebidas" role="tab" aria-selected="true">
+      🍺 Bebidas
+    </button>
+    <button class="cat-tab" data-cat="comida" role="tab" aria-selected="false">
+      🍕 Comida
+    </button>
+  </nav>
+
+  <!-- Loading state -->
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <span>Cargando carta…</span>
+  </div>
+
+  <!-- Menu content -->
+  <main id="content" style="display:none">
+
+    <!-- BEBIDAS -->
+    <section id="cat-bebidas" class="cat-panel active" role="tabpanel">
+      <div id="bebidas-content"></div>
+    </section>
+
+    <!-- COMIDA -->
+    <section id="cat-comida" class="cat-panel" role="tabpanel">
+      <div id="comida-content"></div>
+    </section>
+
+  </main>
+
+  <!-- Toast notification (for errors only, not shown in guest mode) -->
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="js/menu.js"></script>
+</body>
+</html>

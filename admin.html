@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Admin · La Tribu Mostra</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ── Login screen ──────────────────────────────────────── -->
+  <div id="login-wrap" class="login-wrap">
+    <div class="login-card">
+
+      <div class="login-logo">
+        <img
+          src="assets/logo.png"
+          alt="Logo"
+          onerror="this.style.display='none'; document.getElementById('login-logo-fb').style.display='inline-flex';"
+        >
+        <span id="login-logo-fb" class="logo-fallback" style="display:none">🌈</span>
+      </div>
+
+      <h2 class="login-title">Panel Admin</h2>
+      <p class="login-sub">La Tribu Mostra</p>
+
+      <form id="login-form" autocomplete="on">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Usuario</label>
+          <input
+            id="login-email"
+            type="text"
+            class="form-input"
+            placeholder="barra"
+            autocomplete="username"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input
+            id="login-password"
+            type="password"
+            class="form-input"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+        <p id="login-error" class="error-msg"></p>
+        <button id="login-btn" type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ── Admin panel ───────────────────────────────────────── -->
+  <div id="admin-wrap" class="admin-wrap">
+
+    <!-- Sticky header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <span class="admin-badge">ADMIN</span>
+        <span class="admin-site-name">La Tribu Mostra</span>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost" style="padding:0.4rem 0.9rem;font-size:0.8rem;">
+        Salir
+      </button>
+    </header>
+
+    <div class="rainbow-bar"></div>
+
+    <!-- Filters -->
+    <div class="admin-filters">
+      <select id="filter-section" class="filter-pill">
+        <option value="">Todas las secciones</option>
+      </select>
+      <select id="filter-available" class="filter-pill">
+        <option value="all">Todos</option>
+        <option value="available">Disponibles</option>
+        <option value="unavailable">No disponibles</option>
+      </select>
+    </div>
+
+    <!-- Add item button -->
+    <div class="admin-actions">
+      <button id="add-item-btn" class="btn-add-item">
+        <span style="font-size:1.1rem">＋</span>
+        Agregar ítem
+      </button>
+    </div>
+
+    <!-- Items list -->
+    <div id="admin-list" class="admin-list">
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Cargando…</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Add item modal ────────────────────────────────────── -->
+  <div id="add-item-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <h3 class="modal-title" id="modal-title">Agregar Ítem</h3>
+
+      <form id="add-item-form" autocomplete="off">
+
+        <div class="form-group">
+          <label class="form-label" for="new-section">Sección *</label>
+          <select id="new-section" class="form-select" required>
+            <!-- populated by JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-name">Nombre *</label>
+          <input
+            id="new-name"
+            type="text"
+            class="form-input"
+            placeholder="ej: Fernet Branca"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-subsection">
+            Subsección <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <input
+            id="new-subsection"
+            type="text"
+            class="form-input"
+            placeholder="ej: Rubias, IPA, Empanadas…"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-description">
+            Descripción <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <input
+            id="new-description"
+            type="text"
+            class="form-input"
+            placeholder="ej: Con ensalada, Vegana…"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-price">Precio ($)</label>
+          <input
+            id="new-price"
+            type="number"
+            class="form-input"
+            placeholder="0"
+            min="0"
+          >
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="close-modal-btn" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="width:auto;flex:1">Agregar</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
