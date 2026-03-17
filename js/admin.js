@@ -205,6 +205,7 @@ function makeAdminItemEl(item) {
       ${item.price ? '$' + Number(item.price).toLocaleString('es-AR') : '—'}
     </span>
     <button class="btn-icon sin-tacc-btn${item.sinTacc ? ' active' : ''}" title="Sin TACC">🌾</button>
+    <button class="btn-icon vegan-btn${item.vegan ? ' active' : ''}" title="Vegano">🌱</button>
     <button class="btn-icon delete-btn" title="Eliminar ítem">🗑</button>
   `;
 
@@ -216,6 +217,20 @@ function makeAdminItemEl(item) {
       item.sinTacc = newVal;
       el.querySelector('.sin-tacc-btn').classList.toggle('active', newVal);
       showToast(newVal ? '🌾 Sin TACC activado' : 'Sin TACC desactivado');
+    } catch (err) {
+      console.error(err);
+      showToast('Error al actualizar', true);
+    }
+  });
+
+  // Toggle vegan
+  el.querySelector('.vegan-btn').addEventListener('click', async () => {
+    const newVal = !item.vegan;
+    try {
+      await updateDoc(doc(db, 'items', item.id), { vegan: newVal });
+      item.vegan = newVal;
+      el.querySelector('.vegan-btn').classList.toggle('active', newVal);
+      showToast(newVal ? '🌱 Vegano activado' : 'Vegano desactivado');
     } catch (err) {
       console.error(err);
       showToast('Error al actualizar', true);
@@ -369,6 +384,7 @@ addItemForm.addEventListener('submit', async e => {
       price,
       available: true,
       sinTacc: false,
+      vegan: false,
       order: maxOrder + 10
     });
     modal.classList.add('hidden');

@@ -221,10 +221,15 @@ function makeItemEl(item) {
     ? `<img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC" title="Sin TACC / Sin Gluten">`
     : '';
 
+  const veganHtml = item.vegan
+    ? `<span class="vegan-badge" title="Vegano">🌱</span>`
+    : '';
+
   el.innerHTML = `
     <div class="item-name-row">
       <span class="item-name">${item.name}</span>
       ${sinTaccHtml}
+      ${veganHtml}
       <span class="item-dots" aria-hidden="true"></span>
       ${priceHtml}
     </div>
