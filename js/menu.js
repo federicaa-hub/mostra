@@ -218,11 +218,12 @@ function makeItemEl(item) {
     : '';
 
   el.innerHTML = `
-    <div class="item-info">
+    <div class="item-name-row">
       <span class="item-name">${item.name}</span>
-      ${descHtml}
+      <span class="item-dots" aria-hidden="true"></span>
+      ${priceHtml}
     </div>
-    ${priceHtml}
+    ${descHtml}
   `;
   return el;
 }
