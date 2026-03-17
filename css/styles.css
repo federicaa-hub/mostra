@@ -385,7 +385,7 @@ body {
   font-family: 'FreeRansomNotes', cursive;
   font-size: clamp(3.2rem, 9vw, 4.2rem);
   letter-spacing: 3px;
-  color: #fff;
+  color: #FFED00;
   line-height: 1.1;
 }
 
