@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap');
 
+@font-face {
+  font-family: 'FreeRansomNotes';
+  src: url('../assets/fonts/FreeRansomNotes.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* ========================
    VARIABLES & RESET
    ======================== */
@@ -21,8 +28,16 @@
   --faint:    #3d3d3d;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   background: var(--bg);
@@ -30,6 +45,7 @@ body {
   font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
 }
 
 /* ========================
@@ -115,7 +131,7 @@ body {
   padding: 0.65rem 0.9rem;
   color: var(--text);
   font-family: 'Nunito', sans-serif;
-  font-size: 0.9rem;
+  font-size: 16px; /* evita zoom en iOS */
   outline: none;
   transition: border-color 0.2s;
   -webkit-appearance: none;
@@ -264,56 +280,18 @@ body {
 
 /* Header */
 .menu-header {
-  background: #0d0d0d;
-  padding: 1.5rem 1.25rem 0;
-  text-align: center;
-}
-.header-logo-wrap {
-  margin-bottom: 0.5rem;
+  background: #0a0a0a;
+  padding: 2rem 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .header-logo {
-  width: 90px;
-  height: 90px;
+  width: clamp(140px, 50vw, 200px);
+  height: clamp(140px, 50vw, 200px);
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid transparent;
-  background: var(--rainbow);
-  background-clip: padding-box;
-}
-.header-logo-fallback {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: var(--rainbow);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-}
-.header-sub {
-  font-family: 'Bangers', cursive;
-  font-size: 0.75rem;
-  letter-spacing: 4px;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 0.15rem;
-}
-.header-title {
-  font-family: 'Bangers', cursive;
-  font-size: 3rem;
-  letter-spacing: 4px;
-  line-height: 1;
-  background: var(--rainbow);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.header-tagline {
-  font-size: 0.75rem;
-  color: var(--faint);
-  margin-top: 0.25rem;
-  margin-bottom: 1rem;
-  letter-spacing: 1px;
+  display: block;
 }
 
 /* Category tabs */
@@ -346,7 +324,7 @@ body {
 }
 
 /* Category section panels */
-.cat-panel { display: none; padding-bottom: 5rem; }
+.cat-panel { display: none; padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
 .cat-panel.active { display: block; }
 
 /* Menu section */

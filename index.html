@@ -2,28 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="assets/logo.png">
   <title>La Tribu Mostra · Carta</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=8">
 </head>
 <body>
 
   <!-- Header -->
   <header class="menu-header">
-    <div class="header-logo-wrap">
-      <img
-        class="header-logo"
-        src="assets/logo.png"
-        alt="La Tribu Mostra"
-        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='inline-flex';"
-      >
-      <span id="logo-fallback" class="header-logo-fallback" style="display:none">🌈</span>
-    </div>
-    <div class="header-sub">Centro Cultural</div>
-    <h1 class="header-title">LA TRIBU MOSTRA</h1>
-    <div class="header-tagline">carta · menú</div>
+    <img class="header-logo" src="assets/logo.png" alt="La Tribu Mostra">
   </header>
 
   <div class="rainbow-bar"></div>
@@ -62,6 +54,6 @@
   <!-- Toast notification (for errors only, not shown in guest mode) -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/menu.js"></script>
+  <script type="module" src="js/menu.js?v=2"></script>
 </body>
 </html>
