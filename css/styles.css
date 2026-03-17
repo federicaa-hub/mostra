@@ -323,8 +323,7 @@ body {
 
 /* Category heading (BEBIDAS / COMIDA) */
 .category-heading {
-  margin-top: 0;
-}
+  margin-top: 0;}
 .cat-title {
   font-family: 'SaiyanSans', cursive;
   font-size: clamp(3.8rem, 14vw, 6rem);
@@ -362,16 +361,14 @@ body {
 /* Menu section */
 .menu-section { margin-bottom: 0; }
 .section-header {
-  padding: 0.75rem 1.25rem;
-  position: relative;
+  padding: 0.75rem 1.25rem;  position: relative;
 }
 .section-header::before { display: none; }
 .section-name {
   font-family: 'FreeRansomNotes', cursive;
   font-size: 2.9rem;
   letter-spacing: 3px;
-  color: #fff;
-  line-height: 1.1;
+  color: #fff;  line-height: 1.1;
 }
 
 /* ── Colores por sección (bandera LGBT+) ─────────────── */
@@ -460,8 +457,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0.9rem 1.25rem;
-  border-top: none;
-  gap: 0.75rem;
+  border-top: none;  gap: 0.75rem;
 }
 .item-info {
   display: flex;
