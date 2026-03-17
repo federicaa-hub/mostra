@@ -126,11 +126,15 @@ function renderList() {
 
   // Apply filters
   let items = [...allItems];
-  if (filters.search)
+  if (filters.search) {
+    const secMap = new Map(sections.map(s => [s.id, (s.name || '').toLowerCase()]));
     items = items.filter(i =>
       i.name.toLowerCase().includes(filters.search) ||
-      (i.description || '').toLowerCase().includes(filters.search)
+      (i.description  || '').toLowerCase().includes(filters.search) ||
+      (i.subsection   || '').toLowerCase().includes(filters.search) ||
+      (secMap.get(i.sectionId) || '').includes(filters.search)
     );
+  }
   if (filters.sectionId)
     items = items.filter(i => i.sectionId === filters.sectionId);
   if (filters.available === 'available')
