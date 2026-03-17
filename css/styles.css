@@ -7,6 +7,27 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'BohoDisplay';
+  src: url('../assets/fonts/BohoDisplayRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Carton';
+  src: url('../assets/fonts/Carton.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SaiyanSans';
+  src: url('../assets/fonts/Saiyan-Sans.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* ========================
    VARIABLES & RESET
    ======================== */
@@ -294,45 +315,47 @@ body {
   display: block;
 }
 
-/* Category tabs */
-.category-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #0d0d0d;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-}
-.cat-tab {
-  flex: 1;
-  padding: 0.9rem 0.5rem;
-  font-family: 'Bangers', cursive;
-  font-size: 1.25rem;
-  letter-spacing: 2px;
-  text-align: center;
-  cursor: pointer;
-  color: var(--muted);
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
-  outline: none;
-}
-.cat-tab.active {
-  color: var(--text);
-  border-bottom-color: var(--orange);
+/* Category divider (rainbow bar between Bebidas and Comida) */
+.cat-divider {
+  height: 4px;
+  background: var(--rainbow);
 }
 
-/* Category section panels */
-.cat-panel { display: none; padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
-.cat-panel.active { display: block; }
+/* Category heading (BEBIDAS / COMIDA) */
+.category-heading {
+  margin-top: 2.5rem;
+}
+.cat-title {
+  font-family: 'SaiyanSans', cursive;
+  font-size: clamp(3.8rem, 14vw, 6rem);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: #3dba4a;
+  -webkit-text-fill-color: #3dba4a;
+  -webkit-text-stroke: 0.8px #1a5c22;
+  background: #f048b0;
+  display: block;
+  padding: 1.4rem 1.25rem 0.6rem;
+  text-align: left;
+  text-shadow:
+    1px 0 0 #3dba4a,
+    -1px 0 0 #3dba4a,
+    0 1px 0 #3dba4a,
+    0 -1px 0 #3dba4a,
+    1px 1px 0 #3dba4a,
+    -1px -1px 0 #3dba4a;
+  line-height: 1;
+}
+
+/* Last category gets bottom safe-area padding */
+.category-block:last-child {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
 
 /* Menu section */
-.menu-section {
-  border-bottom: 1px solid var(--border);
-}
+.menu-section { }
 .section-header {
-  padding: 1.25rem 1.25rem 0.5rem;
+  padding: 1.25rem 1.25rem 0.75rem;
   position: relative;
   padding-left: 1.5rem;
 }
@@ -347,9 +370,9 @@ body {
   border-radius: 2px;
 }
 .section-name {
-  font-family: 'Bangers', cursive;
-  font-size: 1.55rem;
-  letter-spacing: 2px;
+  font-family: 'FreeRansomNotes', cursive;
+  font-size: 2rem;
+  letter-spacing: 3px;
   color: var(--text);
   line-height: 1.1;
 }
@@ -376,7 +399,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.65rem 1.25rem;
+  padding: 0.8rem 1.25rem;
   border-top: 1px solid #1a1a1a;
   gap: 0.75rem;
 }
