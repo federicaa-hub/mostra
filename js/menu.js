@@ -51,13 +51,20 @@ async function init() {
 // ── Render ───────────────────────────────────────────────────────────────────
 
 function renderMenu(items) {
-  const bebidasEl = document.getElementById('bebidas-content');
-  const comidaEl  = document.getElementById('comida-content');
+  const promosEl    = document.getElementById('promociones-content');
+  const promosBlock = document.getElementById('promociones-block');
+  const bebidasEl   = document.getElementById('bebidas-content');
+  const comidaEl    = document.getElementById('comida-content');
 
+  if (promosEl)  promosEl.innerHTML  = '';
   bebidasEl.innerHTML = '';
   comidaEl.innerHTML  = '';
 
   // Sort sections by category/order
+  const promosSections = [...sections.values()]
+    .filter(s => s.category === 'PROMOCIONES')
+    .sort((a, b) => a.order - b.order);
+
   const bebidasSections = [...sections.values()]
     .filter(s => s.category === 'BEBIDAS')
     .sort((a, b) => a.order - b.order);
@@ -65,6 +72,12 @@ function renderMenu(items) {
   const comidaSections = [...sections.values()]
     .filter(s => s.category === 'COMIDA')
     .sort((a, b) => a.order - b.order);
+
+  // Render promos — hide the entire block if nothing is available
+  if (promosEl && promosBlock) {
+    promosSections.forEach(s => renderSection(promosEl, s, items));
+    promosBlock.style.display = promosEl.hasChildNodes() ? '' : 'none';
+  }
 
   bebidasSections.forEach(s => renderSection(bebidasEl, s, items));
   comidaSections.forEach(s  => renderSection(comidaEl,  s, items));

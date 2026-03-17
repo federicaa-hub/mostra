@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="assets/logo.png">
   <title>La Tribu Mostra · Carta</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/styles.css?v=24">
+  <link rel="stylesheet" href="css/styles.css?v=25">
 </head>
 <body>
 
@@ -40,6 +40,14 @@
   <!-- Menu content -->
   <main id="content" style="display:none">
 
+    <!-- PROMOCIONES (oculto si no hay promos activas) -->
+    <div class="category-block" id="promociones-block" style="display:none">
+      <div class="category-heading">
+        <h2 class="cat-title">Promociones</h2>
+      </div>
+      <div id="promociones-content"></div>
+    </div>
+
     <!-- BEBIDAS -->
     <div class="category-block">
       <div class="category-heading">
@@ -61,6 +69,6 @@
   <!-- Toast notification (for errors only, not shown in guest mode) -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/menu.js?v=5"></script>
+  <script type="module" src="js/menu.js?v=6"></script>
 </body>
 </html>
