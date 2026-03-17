@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migración · Pizza y Papizza → Quesofu</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div id="login-wrap" class="login-wrap">
+    <div class="login-card">
+      <h2 class="login-title" style="margin-bottom:0.5rem">Migración</h2>
+      <p class="login-sub">Cambia "Vegana" por "Quesofu" en la descripción<br>de Pizza y Papizza.</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email admin</label>
+          <input id="login-email" type="email" class="form-input" placeholder="admin@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input id="login-password" type="password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <p id="login-error" class="error-msg"></p>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="panel-wrap" class="seed-wrap" style="display:none">
+    <div class="seed-card">
+      <h2>Pizza y Papizza → Quesofu</h2>
+      <p>
+        Actualiza la descripción de <strong>Pizza</strong> y <strong>Papizza</strong>:<br>
+        <em>"Mozzarella / Vegana"</em> → <em>"Mozzarella / Quesofu"</em>
+      </p>
+      <button id="preview-btn" class="btn btn-ghost" style="width:100%;margin-bottom:0.5rem">
+        👁 Ver qué va a cambiar
+      </button>
+      <button id="migrate-btn" class="btn btn-primary" style="width:100%" disabled>
+        Aplicar cambios
+      </button>
+      <div id="log" style="display:none;margin-top:1rem;font-family:monospace;font-size:0.8rem;background:#111;padding:1rem;border-radius:8px;max-height:300px;overflow-y:auto;color:#eee"></div>
+      <div id="done" style="display:none;margin-top:1rem">
+        <p style="color:#22c55e;font-weight:700">✓ Migración completada.</p>
+        <a href="index.html" class="btn btn-ghost" style="margin-top:0.75rem;display:inline-flex">Ver carta</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, auth } from './js/firebase-config.js';
+    import {
+      collection, query, where, getDocs, updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      signInWithEmailAndPassword, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, user => {
+      document.getElementById('login-wrap').style.display = user ? 'none' : 'flex';
+      document.getElementById('panel-wrap').style.display = user ? 'flex' : 'none';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Entrando…';
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById('login-email').value.trim(),
+          document.getElementById('login-password').value
+        );
+      } catch {
+        document.getElementById('login-error').textContent = 'Email o contraseña incorrectos.';
+        btn.disabled = false; btn.textContent = 'Entrar';
+      }
+    });
+
+    const logEl = document.getElementById('log');
+    function log(msg, color = '#eee') {
+      logEl.style.display = 'block';
+      const line = document.createElement('div');
+      line.style.color = color;
+      line.textContent = msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    const TARGETS = ['Pizza', 'Papizza'];
+    const OLD_DESC = 'Mozzarella / Vegana';
+    const NEW_DESC = 'Mozzarella / Quesofu';
+
+    async function getTargetItems() {
+      const q = query(collection(db, 'items'), where('sectionId', '==', 'comida'));
+      const snap = await getDocs(q);
+      return snap.docs.filter(d =>
+        TARGETS.includes(d.data().name) && d.data().description === OLD_DESC
+      );
+    }
+
+    document.getElementById('preview-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('preview-btn');
+      btn.disabled = true; btn.textContent = 'Buscando…';
+      logEl.innerHTML = '';
+      try {
+        const docs = await getTargetItems();
+        if (docs.length === 0) {
+          log('⚠️ No se encontraron ítems para actualizar (¿ya fue aplicada la migración?)', '#facc15');
+        } else {
+          docs.forEach(d => {
+            log(`  • "${d.data().name}":`, '#eee');
+            log(`    antes:   "${d.data().description}"`, '#fca5a5');
+            log(`    después: "${NEW_DESC}"`, '#86efac');
+          });
+          log('');
+          log('Presioná "Aplicar cambios" para confirmar.');
+          document.getElementById('migrate-btn').disabled = false;
+        }
+      } catch (err) {
+        log(`✗ Error: ${err.message}`, '#f87171');
+      }
+      btn.disabled = false; btn.textContent = '👁 Ver qué va a cambiar';
+    });
+
+    document.getElementById('migrate-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('migrate-btn');
+      btn.disabled = true; btn.textContent = 'Aplicando…';
+      try {
+        const docs = await getTargetItems();
+        let ok = 0;
+        for (const d of docs) {
+          await updateDoc(d.ref, { description: NEW_DESC });
+          log(`  ✓ "${d.data().name}" actualizado`, '#86efac');
+          ok++;
+        }
+        log(`\nCompletado: ${ok} ítem(s) actualizado(s).`, '#22c55e');
+        document.getElementById('done').style.display = 'block';
+      } catch (err) {
+        log(`✗ Error: ${err.message}`, '#f87171');
+        btn.disabled = false; btn.textContent = 'Aplicar cambios';
+      }
+    });
+  </script>
+</body>
+</html>
