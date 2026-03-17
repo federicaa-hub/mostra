@@ -443,10 +443,11 @@ body {
   color: rgba(0,0,0,0.65);
 }
 .section-desc {
-  font-size: 0.78rem;
+  font-size: 1rem;
   color: var(--muted);
   font-style: italic;
-  margin-top: 0.15rem;
+  margin-top: 0.25rem;
+  line-height: 1.5;
 }
 
 /* Subsection */
