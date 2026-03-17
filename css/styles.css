@@ -413,7 +413,7 @@ body {
 .section--cervezas-litro .subsection-name,
 .section--vinos          .subsection-name,
 .section--sin-alcohol    .subsection-name,
-.section--comida         .subsection-name { color: rgba(255,255,255,0.5); }
+.section--comida         .subsection-name { color: rgba(255,255,255,0.75); }
 
 /* Texto para fondos CLAROS (naranja, amarillo) → oscuro */
 .section--aperitivos    .section-name,
@@ -432,7 +432,7 @@ body {
 .section--cervezas-lata .item-price { color: #5a2d00; }
 
 .section--aperitivos    .subsection-name,
-.section--cervezas-lata .subsection-name { color: rgba(0,0,0,0.45); }
+.section--cervezas-lata .subsection-name { color: rgba(0,0,0,0.65); }
 .section-desc {
   font-size: 0.78rem;
   color: var(--muted);
@@ -443,12 +443,12 @@ body {
 /* Subsection */
 .subsection { margin-top: 0.25rem; }
 .subsection-name {
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 3px;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--faint);
-  padding: 0.6rem 1.25rem 0.2rem;
+  padding: 0.8rem 1.25rem 0.2rem;
 }
 
 /* Menu item row */
