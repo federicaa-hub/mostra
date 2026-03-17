@@ -957,31 +957,128 @@ body {
 .promo-mgmt-body.hidden { display: none; }
 .promo-add-form {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
-.promo-add-form .form-input { flex: 1; margin-bottom: 0; }
-.promo-add-form .btn { white-space: nowrap; padding: 0.6rem 1rem; width: auto; }
-.promo-add-form .btn-primary { width: auto; }
-.promo-sections-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.promo-add-form .form-input { margin-bottom: 0; }
+.promo-add-form .btn-primary { width: 100%; }
+.promo-sections-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .promo-section-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 0.5rem 0.75rem;
+  padding: 0.65rem 0.75rem;
+}
+.promo-section-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
 }
 .promo-section-name {
-  flex: 1;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--yellow);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.promo-price-badge {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text);
+  background: #2a2a2a;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+}
+.promo-section-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.promo-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+}
+.promo-tag {
+  font-size: 0.75rem;
+  background: #252525;
+  color: var(--text);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
 }
 .promo-empty {
   font-size: 0.85rem;
   color: var(--muted);
   text-align: center;
   padding: 0.5rem 0;
+}
+
+/* textarea inside modal */
+textarea.form-input {
+  resize: vertical;
+  min-height: 70px;
+  line-height: 1.5;
+}
+
+/* ========================
+   PROMO CARDS — index.html
+   ======================== */
+
+.promo-card {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-left: 3px solid var(--yellow);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin: 0.4rem 1rem;
+}
+.promo-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+.promo-title {
+  font-family: 'FreeRansomNotes', cursive;
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+  color: #fff;
+  line-height: 1.1;
+  flex: 1;
+}
+.promo-price-tag {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--yellow);
+  white-space: nowrap;
+}
+.promo-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+  margin-bottom: 0.45rem;
+}
+.promo-components {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+.promo-component {
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #252525;
+  color: var(--text);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
 }

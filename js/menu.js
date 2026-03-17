@@ -4,48 +4,53 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { initSearch, applyFilter, getCurrentQuery } from './search.js';
 
-// Map of sectionId → section data (fetched once)
+// Map of sectionId → section data (real-time)
 const sections = new Map();
 
 // ── Initialization ──────────────────────────────────────────────────────────
 
-let searchReady = false;
+let latestItems  = null;
+let searchReady  = false;
 
-async function init() {
-  try {
-    // Fetch sections once (they rarely change)
-    const snap = await getDocs(query(collection(db, 'sections'), orderBy('order')));
+function maybeRender() {
+  if (sections.size === 0 || latestItems === null) return;
+  renderMenu(latestItems);
+  hideLoading();
+  if (!searchReady) {
+    initSearch();
+    searchReady = true;
+  } else {
+    applyFilter(getCurrentQuery());
+  }
+}
+
+function init() {
+  // Real-time sections (needed so promo availability updates instantly)
+  onSnapshot(query(collection(db, 'sections'), orderBy('order')), snap => {
+    sections.clear();
     snap.forEach(d => sections.set(d.id, { id: d.id, ...d.data() }));
+    maybeRender();
+  }, err => {
+    console.error('Error loading sections:', err);
+    showError('No se pudo cargar el menú. Recargá la página.');
+  });
 
-    // Real-time listener: only available items
-    const q = query(collection(db, 'items'), where('available', '==', true));
-
-    onSnapshot(q, snapshot => {
-      const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderMenu(items);
-      hideLoading();
-
-      // Init search once after first render; re-apply filter on subsequent renders
-      if (!searchReady) {
-        initSearch();
-        searchReady = true;
-      } else {
-        applyFilter(getCurrentQuery());
-      }
-    }, err => {
+  // Real-time items (available only — bebidas & comida)
+  onSnapshot(
+    query(collection(db, 'items'), where('available', '==', true)),
+    snapshot => {
+      latestItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      maybeRender();
+    },
+    err => {
       console.error('Error loading items:', err);
       showError('No se pudo cargar el menú. Recargá la página.');
-    });
-
-  } catch (err) {
-    console.error('Error initializing:', err);
-    showError('No se pudo conectar. Revisá tu conexión y recargá.');
-  }
+    }
+  );
 }
 
 // ── Render ───────────────────────────────────────────────────────────────────
@@ -73,9 +78,9 @@ function renderMenu(items) {
     .filter(s => s.category === 'COMIDA')
     .sort((a, b) => a.order - b.order);
 
-  // Render promos — hide the entire block if nothing is available
+  // Render promos — each promo is self-contained in the section document
   if (promosEl && promosBlock) {
-    promosSections.forEach(s => renderSection(promosEl, s, items));
+    promosSections.forEach(s => renderPromoCard(promosEl, s));
     promosBlock.style.display = promosEl.hasChildNodes() ? '' : 'none';
   }
 
@@ -164,6 +169,40 @@ function renderSection(container, section, allItems) {
   });
 
   container.appendChild(sectionEl);
+}
+
+function renderPromoCard(container, section) {
+  if (!section.available) return;
+
+  const el = document.createElement('div');
+  el.className = 'promo-card';
+
+  const priceHtml = section.price
+    ? `<span class="promo-price-tag">$${Number(section.price).toLocaleString('es-AR')}</span>`
+    : '';
+  const descHtml = section.description
+    ? `<div class="promo-desc">${section.description}</div>`
+    : '';
+  const bebidaHtml = section.bebida
+    ? `<div class="promo-component">🍺 ${section.bebida}</div>`
+    : '';
+  const comidaHtml = section.comida
+    ? `<div class="promo-component">🍽️ ${section.comida}</div>`
+    : '';
+  const componentsHtml = (bebidaHtml || comidaHtml)
+    ? `<div class="promo-components">${bebidaHtml}${comidaHtml}</div>`
+    : '';
+
+  el.innerHTML = `
+    <div class="promo-header-row">
+      <span class="promo-title">${section.name}</span>
+      ${priceHtml}
+    </div>
+    ${descHtml}
+    ${componentsHtml}
+  `;
+
+  container.appendChild(el);
 }
 
 function makeItemEl(item) {

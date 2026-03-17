@@ -100,8 +100,16 @@
       <div id="promo-mgmt-body" class="promo-mgmt-body hidden">
         <form id="add-promo-section-form" class="promo-add-form">
           <input id="promo-section-name" type="text" class="form-input"
-                 placeholder="Nombre (ej: 2×1 Cervezas)" required>
-          <button type="submit" class="btn btn-primary">＋ Crear</button>
+                 placeholder="Título (ej: 2 tragos + tostón)" required>
+          <input id="promo-section-desc" type="text" class="form-input"
+                 placeholder="Descripción (opcional)">
+          <input id="promo-section-price" type="number" class="form-input"
+                 placeholder="Precio ($)" min="0">
+          <input id="promo-section-bebida" type="text" class="form-input"
+                 placeholder="Bebida incluida (opcional)">
+          <input id="promo-section-comida" type="text" class="form-input"
+                 placeholder="Comida incluida (opcional)">
+          <button type="submit" class="btn btn-primary">＋ Crear promo</button>
         </form>
         <div id="promo-sections-list" class="promo-sections-list"></div>
       </div>
@@ -180,6 +188,56 @@
         <div class="modal-actions">
           <button type="button" id="close-modal-btn" class="btn btn-ghost">Cancelar</button>
           <button type="submit" class="btn btn-primary" style="width:auto;flex:1">Agregar</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Edit promo modal ───────────────────────────────── -->
+  <div id="edit-promo-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-promo-modal-title">
+    <div class="modal">
+      <h3 class="modal-title" id="edit-promo-modal-title">Editar Promo</h3>
+
+      <form id="edit-promo-form" autocomplete="off">
+
+        <div class="form-group">
+          <label class="form-label" for="edit-promo-name">Título *</label>
+          <input id="edit-promo-name" type="text" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-promo-desc">
+            Descripción <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <textarea id="edit-promo-desc" class="form-input" rows="3"
+                    placeholder="Descripción detallada de la promo…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-promo-price">Precio ($)</label>
+          <input id="edit-promo-price" type="number" class="form-input" min="0" placeholder="0">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-promo-bebida">
+            Bebida <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <input id="edit-promo-bebida" type="text" class="form-input"
+                 placeholder="ej: 2 tragos a elección">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-promo-comida">
+            Comida <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <input id="edit-promo-comida" type="text" class="form-input"
+                 placeholder="ej: 1 tostón a elección">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="close-edit-promo-btn" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="width:auto;flex:1">Guardar</button>
         </div>
 
       </form>

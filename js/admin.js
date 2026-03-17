@@ -378,31 +378,40 @@ function renderPromoSections() {
   const promoSecs = sections.filter(s => s.category === 'PROMOCIONES');
 
   if (promoSecs.length === 0) {
-    list.innerHTML = '<p class="promo-empty">Sin secciones de promo. Creá una arriba.</p>';
+    list.innerHTML = '<p class="promo-empty">Sin promos. Creá una arriba.</p>';
     return;
   }
 
   list.innerHTML = '';
   promoSecs.forEach(sec => {
-    const secItems = allItems.filter(i => i.sectionId === sec.id);
-    const isActive = secItems.length > 0 && secItems.some(i => i.available);
-
     const el = document.createElement('div');
     el.className = 'promo-section-row';
+
+    const priceStr  = sec.price ? `$${Number(sec.price).toLocaleString('es-AR')}` : '';
+    const bebidaTag = sec.bebida ? `<span class="promo-tag">🍺 ${sec.bebida}</span>` : '';
+    const comidaTag = sec.comida ? `<span class="promo-tag">🍽️ ${sec.comida}</span>` : '';
+    const tagsHtml  = (bebidaTag || comidaTag) ? `<div class="promo-tags">${bebidaTag}${comidaTag}</div>` : '';
+
     el.innerHTML = `
-      <label class="toggle">
-        <input type="checkbox" ${isActive ? 'checked' : ''}>
+      <label class="toggle" style="align-self:flex-start;margin-top:2px">
+        <input type="checkbox" ${sec.available ? 'checked' : ''}>
         <span class="toggle-slider"></span>
       </label>
-      <span class="promo-section-name">${sec.name}</span>
-      <button class="btn-icon delete-promo-btn" data-id="${sec.id}" title="Eliminar sección">🗑</button>
+      <div class="promo-section-info">
+        <div class="promo-section-name">
+          ${sec.name}${priceStr ? ` <span class="promo-price-badge">${priceStr}</span>` : ''}
+        </div>
+        ${sec.description ? `<div class="promo-section-desc">${sec.description}</div>` : ''}
+        ${tagsHtml}
+      </div>
+      <button class="btn-icon edit-promo-btn" title="Editar promo">✏️</button>
+      <button class="btn-icon delete-promo-btn" title="Eliminar promo">🗑</button>
     `;
 
     el.querySelector('input[type="checkbox"]').addEventListener('change', async e => {
       const available = e.target.checked;
       try {
-        const itemsToUpdate = allItems.filter(i => i.sectionId === sec.id);
-        await Promise.all(itemsToUpdate.map(i => updateDoc(doc(db, 'items', i.id), { available })));
+        await updateDoc(doc(db, 'sections', sec.id), { available });
         showToast(available ? `✓ ${sec.name} activada` : `✗ ${sec.name} desactivada`);
       } catch (err) {
         console.error(err);
@@ -411,6 +420,7 @@ function renderPromoSections() {
       }
     });
 
+    el.querySelector('.edit-promo-btn').addEventListener('click', () => openEditPromo(sec));
     el.querySelector('.delete-promo-btn').addEventListener('click', () => deletePromoSection(sec));
     list.appendChild(el);
   });
@@ -425,8 +435,7 @@ async function reloadSections() {
 
 document.getElementById('add-promo-section-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const nameInput = document.getElementById('promo-section-name');
-  const name      = nameInput.value.trim();
+  const name = document.getElementById('promo-section-name').value.trim();
   if (!name) return;
 
   const btn = e.target.querySelector('button[type="submit"]');
@@ -435,33 +444,90 @@ document.getElementById('add-promo-section-form').addEventListener('submit', asy
   try {
     await addDoc(collection(db, 'sections'), {
       name,
+      description: document.getElementById('promo-section-desc').value.trim() || '',
+      price:       parseInt(document.getElementById('promo-section-price').value) || 0,
+      bebida:      document.getElementById('promo-section-bebida').value.trim() || null,
+      comida:      document.getElementById('promo-section-comida').value.trim() || null,
+      available:   true,
       category:    'PROMOCIONES',
-      description: '',
       order:       0
     });
-    nameInput.value = '';
+    e.target.reset();
     await reloadSections();
-    showToast('✓ Sección de promo creada');
+    showToast('✓ Promo creada');
   } catch (err) {
     console.error(err);
-    showToast('Error al crear sección', true);
+    showToast('Error al crear promo', true);
   }
   btn.disabled = false;
 });
 
 async function deletePromoSection(sec) {
-  if (!confirm(`¿Eliminar la sección "${sec.name}"?\nTambién se eliminarán todos sus ítems.`)) return;
+  if (!confirm(`¿Eliminar la promo "${sec.name}"?\nEsta acción no se puede deshacer.`)) return;
   try {
-    const itemsInSection = allItems.filter(i => i.sectionId === sec.id);
-    await Promise.all(itemsInSection.map(i => deleteDoc(doc(db, 'items', i.id))));
     await deleteDoc(doc(db, 'sections', sec.id));
     await reloadSections();
-    showToast('Sección eliminada');
+    showToast('Promo eliminada');
   } catch (err) {
     console.error(err);
     showToast('Error al eliminar', true);
   }
 }
+
+// ── Edit promo modal ──────────────────────────────────────────────────────────
+
+let editingPromoId = null;
+
+function openEditPromo(sec) {
+  editingPromoId = sec.id;
+  document.getElementById('edit-promo-name').value   = sec.name        || '';
+  document.getElementById('edit-promo-desc').value   = sec.description || '';
+  document.getElementById('edit-promo-price').value  = sec.price       || '';
+  document.getElementById('edit-promo-bebida').value = sec.bebida      || '';
+  document.getElementById('edit-promo-comida').value = sec.comida      || '';
+  document.getElementById('edit-promo-modal').classList.remove('hidden');
+}
+
+document.getElementById('close-edit-promo-btn').addEventListener('click', () => {
+  document.getElementById('edit-promo-modal').classList.add('hidden');
+  editingPromoId = null;
+});
+
+document.getElementById('edit-promo-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('edit-promo-modal')) {
+    document.getElementById('edit-promo-modal').classList.add('hidden');
+    editingPromoId = null;
+  }
+});
+
+document.getElementById('edit-promo-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!editingPromoId) return;
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+
+  const name = document.getElementById('edit-promo-name').value.trim();
+  if (!name) { btn.disabled = false; return; }
+
+  try {
+    await updateDoc(doc(db, 'sections', editingPromoId), {
+      name,
+      description: document.getElementById('edit-promo-desc').value.trim()   || '',
+      price:       parseInt(document.getElementById('edit-promo-price').value) || 0,
+      bebida:      document.getElementById('edit-promo-bebida').value.trim()  || null,
+      comida:      document.getElementById('edit-promo-comida').value.trim()  || null,
+    });
+    document.getElementById('edit-promo-modal').classList.add('hidden');
+    editingPromoId = null;
+    await reloadSections();
+    showToast('✓ Promo actualizada');
+  } catch (err) {
+    console.error(err);
+    showToast('Error al guardar', true);
+  }
+  btn.disabled = false;
+});
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
 
