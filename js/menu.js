@@ -112,7 +112,7 @@ function renderSection(container, section, allItems) {
 
 function makeItemEl(item) {
   const el = document.createElement('div');
-  el.className = 'menu-item';
+  el.className = 'menu-item' + (!item.subsection ? ' menu-item--no-sub' : '');
 
   const priceHtml = item.price
     ? `<span class="item-price">$${Number(item.price).toLocaleString('es-AR')}</span>`

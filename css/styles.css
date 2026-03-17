@@ -433,6 +433,15 @@ body {
 
 .section--aperitivos    .subsection-name,
 .section--cervezas-lata .subsection-name { color: rgba(0,0,0,0.65); }
+
+/* Ítems sin subsección en aperitivos → mismo estilo visual que subsección */
+.section--aperitivos .menu-item--no-sub .item-name {
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(0,0,0,0.65);
+}
 .section-desc {
   font-size: 0.78rem;
   color: var(--muted);
