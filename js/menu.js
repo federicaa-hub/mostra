@@ -218,7 +218,7 @@ function makeItemEl(item) {
     : '';
 
   const sinTaccHtml = item.sinTacc
-    ? `<span class="sin-tacc-badge" title="Sin TACC / Sin Gluten">SIN TACC</span>`
+    ? `<img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC" title="Sin TACC / Sin Gluten">`
     : '';
 
   el.innerHTML = `
