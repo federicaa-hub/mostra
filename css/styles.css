@@ -415,13 +415,13 @@ body {
 .section--cervezas-litro .item-name,
 .section--vinos          .item-name,
 .section--sin-alcohol    .item-name,
-.section--comida         .item-name { color: #fff; }
+.section--comida         .item-name { color: #FFED00; }
 
 .section--tragos         .item-desc,
 .section--cervezas-litro .item-desc,
 .section--vinos          .item-desc,
 .section--sin-alcohol    .item-desc,
-.section--comida         .item-desc { color: rgba(255,255,255,0.7); }
+.section--comida         .item-desc { color: rgba(255,237,0,0.5); }
 
 .section--tragos         .item-price,
 .section--cervezas-litro .item-price,
@@ -433,7 +433,7 @@ body {
 .section--cervezas-litro .subsection-name,
 .section--vinos          .subsection-name,
 .section--sin-alcohol    .subsection-name,
-.section--comida         .subsection-name { color: rgba(255,255,255,0.75); }
+.section--comida         .subsection-name { color: rgba(255,237,0,0.55); }
 
 .section--tragos         .item-dots,
 .section--cervezas-litro .item-dots,
