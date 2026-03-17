@@ -25,4 +25,4 @@ dist/
 build/
 
 # Seed — herramienta de carga inicial, no se necesita en producción
-seed.html
+seed.js
