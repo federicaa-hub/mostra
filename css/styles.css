@@ -307,7 +307,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 5;
 }
 .menu-header::before {
   content: '';
@@ -326,7 +327,33 @@ body {
   display: block;
 }
 
-/* Category divider (rainbow bar between Bebidas and Comida) */
+/* Header cat */
+.header-cat-wrap {
+  position: absolute;
+  bottom: -8px;
+  right: 1.5rem;
+  z-index: 2;
+  animation: catEntrance 0.9s cubic-bezier(.34,1.56,.64,1) 0.4s both;
+}
+.header-cat {
+  width: 88px;
+  height: auto;
+  display: block;
+}
+.cat-tail {
+  transform-origin: 0 0;
+  animation: tailWag 1.4s ease-in-out infinite alternate;
+}
+@keyframes tailWag {
+  from { transform: rotate(-20deg); }
+  to   { transform: rotate(20deg); }
+}
+@keyframes catEntrance {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Category divider (rainbow bar between Bebidas y Comida) */
 .cat-divider {
   height: 4px;
   background: var(--rainbow);
