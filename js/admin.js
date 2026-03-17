@@ -110,10 +110,13 @@ document.getElementById('filter-available').addEventListener('change', e => {
   filters.available = e.target.value;
   renderList();
 });
-document.getElementById('admin-search').addEventListener('input', e => {
+const searchEl = document.getElementById('admin-search');
+searchEl.addEventListener('input', e => {
   filters.search = e.target.value.toLowerCase().trim();
   renderList();
 });
+searchEl.addEventListener('focus', () => { searchEl.placeholder = 'Buscar…'; });
+searchEl.addEventListener('blur',  () => { if (!searchEl.value) searchEl.placeholder = '🔍 Buscar…'; });
 
 // ── Render list ───────────────────────────────────────────────────────────────
 
