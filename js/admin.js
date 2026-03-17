@@ -23,12 +23,7 @@ let sections    = [];
 let unsubItems  = null;
 let filters     = { sectionId: '', available: 'all', search: '' };
 
-// Convierte un nombre de usuario simple en un email válido para Firebase Auth.
-// Ej: "barra" → "barra@mostra.admin"
-// Si ya contiene "@" lo usa tal cual (compatibilidad).
-function toFirebaseEmail(username) {
-  return username.includes('@') ? username : `${username}@mostra.admin`;
-}
+const ADMIN_EMAIL = 'barra@mostra.admin';
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
@@ -44,10 +39,24 @@ onAuthStateChanged(auth, user => {
   }
 });
 
+// Toggle mostrar/ocultar contraseña
+document.getElementById('toggle-password').addEventListener('click', () => {
+  const input = document.getElementById('login-password');
+  const btn   = document.getElementById('toggle-password');
+  if (input.type === 'password') {
+    input.type    = 'text';
+    btn.textContent = '🙈';
+    btn.setAttribute('aria-label', 'Ocultar contraseña');
+  } else {
+    input.type    = 'password';
+    btn.textContent = '👁';
+    btn.setAttribute('aria-label', 'Mostrar contraseña');
+  }
+});
+
 // Login form
 document.getElementById('login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const btn      = document.getElementById('login-btn');
   const errEl    = document.getElementById('login-error');
@@ -57,9 +66,9 @@ document.getElementById('login-form').addEventListener('submit', async e => {
   errEl.textContent  = '';
 
   try {
-    await signInWithEmailAndPassword(auth, toFirebaseEmail(email), password);
+    await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
   } catch {
-    errEl.textContent = 'Usuario o contraseña incorrectos.';
+    errEl.textContent = 'Contraseña incorrecta.';
     btn.disabled      = false;
     btn.textContent   = 'Entrar';
   }
