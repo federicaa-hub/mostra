@@ -7,6 +7,7 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { initSearch, applyFilter, getCurrentQuery } from './search.js';
+import { t, sectionName, initLang } from './i18n.js';
 
 // Map of sectionId → section data (real-time)
 const sections = new Map();
@@ -29,6 +30,15 @@ function maybeRender() {
 }
 
 function init() {
+  initLang();
+
+  window.addEventListener('langchange', () => {
+    if (latestItems !== null) {
+      renderMenu(latestItems);
+      applyFilter(getCurrentQuery());
+    }
+  });
+
   // Real-time sections (needed so promo availability updates instantly)
   onSnapshot(query(collection(db, 'sections'), orderBy('order')), snap => {
     sections.clear();
@@ -36,7 +46,7 @@ function init() {
     maybeRender();
   }, err => {
     console.error('Error loading sections:', err);
-    showError('No se pudo cargar el menú. Recargá la página.');
+    showError();
   });
 
   // Real-time items (available only — bebidas & comida)
@@ -48,7 +58,7 @@ function init() {
     },
     err => {
       console.error('Error loading items:', err);
-      showError('No se pudo cargar el menú. Recargá la página.');
+      showError();
     }
   );
 }
@@ -88,10 +98,10 @@ function renderMenu(items) {
   comidaSections.forEach(s  => renderSection(comidaEl,  s, items));
 
   if (!bebidasEl.hasChildNodes())
-    bebidasEl.innerHTML = '<p class="empty-state">Sin bebidas disponibles por ahora.</p>';
+    bebidasEl.innerHTML = `<p class="empty-state">${t('emptyBebidas')}</p>`;
 
   if (!comidaEl.hasChildNodes())
-    comidaEl.innerHTML = '<p class="empty-state">Sin comidas disponibles por ahora.</p>';
+    comidaEl.innerHTML = `<p class="empty-state">${t('emptyComida')}</p>`;
 }
 
 function renderSection(container, section, allItems) {
@@ -109,7 +119,7 @@ function renderSection(container, section, allItems) {
   const headerEl = document.createElement('div');
   headerEl.className = 'section-header';
   headerEl.innerHTML = `
-    <div class="section-name">${section.name}</div>
+    <div class="section-name">${sectionName(section)}</div>
     ${section.description ? `<div class="section-desc">${section.description}</div>` : ''}
   `;
   sectionEl.appendChild(headerEl);
@@ -218,11 +228,11 @@ function makeItemEl(item) {
     : '';
 
   const sinTaccHtml = item.sinTacc
-    ? `<img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC" title="Sin TACC / Sin Gluten">`
+    ? `<img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC" title="${t('sinTaccTitle')}">`
     : '';
 
   const veganHtml = item.vegan
-    ? `<span class="vegan-badge" title="Vegano">🌱</span>`
+    ? `<span class="vegan-badge" title="${t('veganTitle')}">🌱</span>`
     : '';
 
   el.innerHTML = `
@@ -247,9 +257,9 @@ function hideLoading() {
   if (content) content.style.display = 'block';
 }
 
-function showError(msg) {
+function showError() {
   const loading = document.getElementById('loading');
-  if (loading) loading.innerHTML = `<p class="empty-state">${msg}</p>`;
+  if (loading) loading.innerHTML = `<p class="empty-state">${t('errorLoad')}</p>`;
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────────

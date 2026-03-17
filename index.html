@@ -13,6 +13,9 @@
 </head>
 <body>
 
+  <!-- Language toggle -->
+  <button id="lang-toggle" class="lang-toggle" aria-label="Cambiar idioma">EN</button>
+
   <!-- Floating search toggle -->
   <button id="search-toggle" class="search-toggle" aria-label="Buscar en el menú">🔍</button>
 
@@ -76,13 +79,13 @@
              placeholder="Buscar en el menú…" autocomplete="off" spellcheck="false">
       <button id="search-close" class="search-close" aria-label="Cerrar buscador">✕</button>
     </div>
-    <p id="search-empty" class="search-empty" style="display:none">No se encuentra</p>
+    <p id="search-empty" class="search-empty" style="display:none" data-i18n="searchEmpty">No se encuentra</p>
   </div>
 
   <!-- Loading state -->
   <div id="loading" class="loading">
     <div class="spinner"></div>
-    <span>Cargando carta…</span>
+    <span data-i18n="loading">Cargando carta…</span>
   </div>
 
   <!-- Menu content -->
@@ -91,7 +94,7 @@
     <!-- PROMOCIONES (oculto si no hay promos activas) -->
     <div class="category-block" id="promociones-block" style="display:none">
       <div class="category-heading">
-        <h2 class="cat-title">Promos</h2>
+        <h2 class="cat-title" data-i18n="catPromos">Promos</h2>
       </div>
       <div id="promociones-content"></div>
     </div>
@@ -99,7 +102,7 @@
     <!-- BEBIDAS -->
     <div class="category-block">
       <div class="category-heading">
-        <h2 class="cat-title">Bebidas</h2>
+        <h2 class="cat-title" data-i18n="catBebidas">Bebidas</h2>
       </div>
       <div id="bebidas-content"></div>
     </div>
@@ -107,11 +110,11 @@
     <!-- COMIDA -->
     <div class="category-block">
       <div class="category-heading">
-        <h2 class="cat-title">Comida</h2>
+        <h2 class="cat-title" data-i18n="catComida">Comida</h2>
         <p class="comida-legend">
-          <span class="legend-item"><span class="vegan-badge" style="display:inline-block">🌱</span> también hay opción vegana</span>
+          <span class="legend-item"><span class="vegan-badge" style="display:inline-block">🌱</span> <span data-i18n="legendVegan">también hay opción vegana</span></span>
           <span class="legend-sep">·</span>
-          <span class="legend-item"><img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC"> sin TACC</span>
+          <span class="legend-item"><img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC"> <span data-i18n="legendSinTacc">sin TACC</span></span>
         </p>
       </div>
       <div id="comida-content"></div>
