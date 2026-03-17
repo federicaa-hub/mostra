@@ -967,13 +967,14 @@ body {
 .promo-section-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.75rem;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
 }
 .promo-section-name {
+  flex: 1;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--yellow);

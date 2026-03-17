@@ -83,6 +83,7 @@ async function loadData() {
     snapshot => {
       allItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderList();
+      renderPromoSections();
     },
     err => {
       console.error('Error loading items:', err);
@@ -380,12 +381,33 @@ function renderPromoSections() {
 
   list.innerHTML = '';
   promoSecs.forEach(sec => {
+    const secItems = allItems.filter(i => i.sectionId === sec.id);
+    const isActive = secItems.length > 0 && secItems.some(i => i.available);
+
     const el = document.createElement('div');
     el.className = 'promo-section-row';
     el.innerHTML = `
+      <label class="toggle">
+        <input type="checkbox" ${isActive ? 'checked' : ''}>
+        <span class="toggle-slider"></span>
+      </label>
       <span class="promo-section-name">${sec.name}</span>
       <button class="btn-icon delete-promo-btn" data-id="${sec.id}" title="Eliminar sección">🗑</button>
     `;
+
+    el.querySelector('input[type="checkbox"]').addEventListener('change', async e => {
+      const available = e.target.checked;
+      try {
+        const itemsToUpdate = allItems.filter(i => i.sectionId === sec.id);
+        await Promise.all(itemsToUpdate.map(i => updateDoc(doc(db, 'items', i.id), { available })));
+        showToast(available ? `✓ ${sec.name} activada` : `✗ ${sec.name} desactivada`);
+      } catch (err) {
+        console.error(err);
+        showToast('Error al actualizar', true);
+        e.target.checked = !available;
+      }
+    });
+
     el.querySelector('.delete-promo-btn').addEventListener('click', () => deletePromoSection(sec));
     list.appendChild(el);
   });
