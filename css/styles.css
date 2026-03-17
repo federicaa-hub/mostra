@@ -571,7 +571,8 @@ body {
 .sin-tacc-badge {
   width: 22px;
   height: 22px;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 50%;
   flex-shrink: 0;
   align-self: center;
   margin-left: 0.5rem;
@@ -588,6 +589,7 @@ body {
   margin-left: 0.5rem;
   margin-right: 0.25rem;
   line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7));
 }
 
 .btn-icon.vegan-btn        { color: var(--muted); }
