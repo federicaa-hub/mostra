@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0a">
   <title>Admin · La Tribu Mostra</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/styles.css?v=29">
+  <link rel="stylesheet" href="css/styles.css?v=30">
 </head>
 <body>
 
@@ -61,16 +61,17 @@
 
     <!-- Sticky header -->
     <header class="admin-header">
-      <div class="admin-header-left">
+      <button id="logout-btn" class="btn-logout-sm" title="Salir">← Salir</button>
+      <div class="admin-header-center">
+        <img src="assets/logo.png" class="admin-logo-sm" alt="Mostra"
+             onerror="this.style.display='none'">
         <span class="admin-badge">ADMIN</span>
-        <span class="admin-site-name">La Tribu Mostra</span>
       </div>
-      <button id="logout-btn" class="btn btn-ghost" style="padding:0.4rem 0.9rem;font-size:0.8rem;">
-        Salir
-      </button>
+      <div class="admin-header-right">
+        <input id="admin-search" type="search" class="admin-search-input"
+               placeholder="🔍 Buscar…" autocomplete="off">
+      </div>
     </header>
-
-    <div class="rainbow-bar"></div>
 
     <!-- Filters -->
     <div class="admin-filters">
@@ -247,6 +248,6 @@
   <!-- Toast -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/admin.js?v=5"></script>
+  <script type="module" src="js/admin.js?v=6"></script>
 </body>
 </html>

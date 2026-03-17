@@ -21,7 +21,7 @@ import {
 let allItems    = [];
 let sections    = [];
 let unsubItems  = null;
-let filters     = { sectionId: '', available: 'all' };
+let filters     = { sectionId: '', available: 'all', search: '' };
 
 // Convierte un nombre de usuario simple en un email válido para Firebase Auth.
 // Ej: "barra" → "barra@mostra.admin"
@@ -110,6 +110,10 @@ document.getElementById('filter-available').addEventListener('change', e => {
   filters.available = e.target.value;
   renderList();
 });
+document.getElementById('admin-search').addEventListener('input', e => {
+  filters.search = e.target.value.toLowerCase().trim();
+  renderList();
+});
 
 // ── Render list ───────────────────────────────────────────────────────────────
 
@@ -119,6 +123,11 @@ function renderList() {
 
   // Apply filters
   let items = [...allItems];
+  if (filters.search)
+    items = items.filter(i =>
+      i.name.toLowerCase().includes(filters.search) ||
+      (i.description || '').toLowerCase().includes(filters.search)
+    );
   if (filters.sectionId)
     items = items.filter(i => i.sectionId === filters.sectionId);
   if (filters.available === 'available')
