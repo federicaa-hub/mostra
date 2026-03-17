@@ -85,8 +85,25 @@ function renderSection(container, section, allItems) {
   `;
   sectionEl.appendChild(headerEl);
 
-  // Group items into subsections while preserving order
-  let currentSub = Symbol('init'); // unique sentinel
+  // Detect solo subsections: subsection name = item name, solo item in group
+  // These render as an inline header row (name + price), no separate item row
+  const subGroups = new Map();
+  items.forEach(item => {
+    const sub = item.subsection ?? null;
+    if (sub) {
+      if (!subGroups.has(sub)) subGroups.set(sub, []);
+      subGroups.get(sub).push(item);
+    }
+  });
+  const soloSubs = new Set(
+    [...subGroups.entries()]
+      .filter(([sub, si]) =>
+        si.length === 1 && si[0].name.toLowerCase() === sub.toLowerCase()
+      )
+      .map(([sub]) => sub)
+  );
+
+  let currentSub = Symbol('init');
   let currentSubEl = null;
 
   items.forEach(item => {
@@ -94,14 +111,29 @@ function renderSection(container, section, allItems) {
 
     if (sub !== currentSub) {
       currentSub = sub;
+      currentSubEl = null;
       if (sub) {
         currentSubEl = document.createElement('div');
         currentSubEl.className = 'subsection';
-        currentSubEl.innerHTML = `<div class="subsection-name">${sub}</div>`;
-        sectionEl.appendChild(currentSubEl);
-      } else {
-        currentSubEl = null;
+
+        if (soloSubs.has(sub)) {
+          // Inline: subsection name + price on same row, no item row
+          const priceHtml = item.price
+            ? `<span class="item-price">$${Number(item.price).toLocaleString('es-AR')}</span>`
+            : '';
+          currentSubEl.innerHTML = `
+            <div class="subsection-name subsection-name--solo">
+              <span>${sub}</span>${priceHtml}
+            </div>`;
+          sectionEl.appendChild(currentSubEl);
+          return; // skip item row
+        } else {
+          currentSubEl.innerHTML = `<div class="subsection-name">${sub}</div>`;
+          sectionEl.appendChild(currentSubEl);
+        }
       }
+    } else if (soloSubs.has(sub)) {
+      return; // safety: skip extra items in solo subs
     }
 
     (currentSubEl || sectionEl).appendChild(makeItemEl(item));

@@ -451,6 +451,12 @@ body {
 
 /* Subsection */
 .subsection { margin-top: 0.25rem; }
+.subsection-name--solo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 1.25rem;
+}
 .subsection-name {
   font-size: 1.3rem;
   font-weight: 900;

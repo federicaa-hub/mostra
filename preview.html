@@ -81,10 +81,10 @@ const ITEMS = [
   { sectionId: 'tragos', name: 'Destornillador',      description: 'Vodka, jugo de naranja',        price: 1800, subsection: null,    order: 7 },
 
   // Aperitivos
-  { sectionId: 'aperitivos', name: 'Campari',         description: null,   price: 1400, subsection: null,     order: 1 },
-  { sectionId: 'aperitivos', name: 'Aperol',          description: null,   price: 1400, subsection: null,     order: 2 },
-  { sectionId: 'aperitivos', name: 'Amargo Obrero',   description: null,   price: 1200, subsection: null,     order: 3 },
-  { sectionId: 'aperitivos', name: 'Cynar',           description: null,   price: 1300, subsection: null,     order: 4 },
+  { sectionId: 'aperitivos', name: 'Campari',       description: null, price: 1400, subsection: 'Campari',       order: 1 },
+  { sectionId: 'aperitivos', name: 'Aperol',        description: null, price: 1400, subsection: 'Aperol',        order: 2 },
+  { sectionId: 'aperitivos', name: 'Amargo Obrero', description: null, price: 1200, subsection: 'Amargo Obrero', order: 3 },
+  { sectionId: 'aperitivos', name: 'Cynar',         description: null, price: 1300, subsection: 'Cynar',         order: 4 },
   { sectionId: 'aperitivos', name: 'Cinzano',         description: null,   price: 1200, subsection: 'Vermut', order: 5 },
   { sectionId: 'aperitivos', name: 'Vecino',          description: null,   price: 1200, subsection: 'Vermut', order: 6 },
   { sectionId: 'aperitivos', name: 'La Fuerza',       description: null,   price: 1200, subsection: 'Vermut', order: 7 },
@@ -154,22 +154,52 @@ function renderSection(container, section, allItems) {
   `;
   sectionEl.appendChild(headerEl);
 
+  // Detect solo subsections (name = subsection, only 1 item)
+  const subGroups = new Map();
+  items.forEach(item => {
+    const sub = item.subsection ?? null;
+    if (sub) {
+      if (!subGroups.has(sub)) subGroups.set(sub, []);
+      subGroups.get(sub).push(item);
+    }
+  });
+  const soloSubs = new Set(
+    [...subGroups.entries()]
+      .filter(([sub, si]) => si.length === 1 && si[0].name.toLowerCase() === sub.toLowerCase())
+      .map(([sub]) => sub)
+  );
+
   let currentSub = Symbol('init');
   let currentSubEl = null;
 
   items.forEach(item => {
     const sub = item.subsection ?? null;
+
     if (sub !== currentSub) {
       currentSub = sub;
+      currentSubEl = null;
       if (sub) {
         currentSubEl = document.createElement('div');
         currentSubEl.className = 'subsection';
-        currentSubEl.innerHTML = `<div class="subsection-name">${sub}</div>`;
-        sectionEl.appendChild(currentSubEl);
-      } else {
-        currentSubEl = null;
+        if (soloSubs.has(sub)) {
+          const priceHtml = item.price
+            ? `<span class="item-price">$${Number(item.price).toLocaleString('es-AR')}</span>`
+            : '';
+          currentSubEl.innerHTML = `
+            <div class="subsection-name subsection-name--solo">
+              <span>${sub}</span>${priceHtml}
+            </div>`;
+          sectionEl.appendChild(currentSubEl);
+          return;
+        } else {
+          currentSubEl.innerHTML = `<div class="subsection-name">${sub}</div>`;
+          sectionEl.appendChild(currentSubEl);
+        }
       }
+    } else if (soloSubs.has(sub)) {
+      return;
     }
+
     (currentSubEl || sectionEl).appendChild(makeItemEl(item));
   });
 
