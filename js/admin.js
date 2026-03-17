@@ -131,8 +131,11 @@ function renderList() {
     return;
   }
 
-  // Group by section (preserving section order), then subsection
-  const sectionOrder = sections.map(s => s.id);
+  // Group by section: PROMOCIONES first, then the rest in order
+  const sectionOrder = [
+    ...sections.filter(s => s.category === 'PROMOCIONES'),
+    ...sections.filter(s => s.category !== 'PROMOCIONES'),
+  ].map(s => s.id);
 
   // Build map: sectionId → items[]
   const bySec = new Map();
