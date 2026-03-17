@@ -330,13 +330,13 @@ body {
 /* Header cat */
 .header-cat-wrap {
   position: absolute;
-  bottom: -8px;
+  bottom: 12px;
   right: 1.5rem;
   z-index: 2;
   animation: catEntrance 0.9s cubic-bezier(.34,1.56,.64,1) 0.4s both;
 }
 .header-cat {
-  width: 88px;
+  width: 108px;
   height: auto;
   display: block;
 }
