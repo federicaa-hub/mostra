@@ -388,6 +388,7 @@ body {
 
 /* COMIDA */
 .section--comida         { background: #008026; }
+.section--comida .section-header { display: none; }
 
 /* Texto para fondos OSCUROS (rojo, azul, violeta, verde) → blanco */
 .section--tragos         .section-desc,
