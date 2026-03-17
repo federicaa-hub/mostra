@@ -228,7 +228,7 @@ function makeItemEl(item) {
     : '';
 
   const sinTaccHtml = item.sinTacc
-    ? `<img class="sin-tacc-badge" src="assets/sintacc.png" alt="Sin TACC" title="${t('sinTaccTitle')}">`
+    ? `<span class="sin-tacc-badge" title="${t('sinTaccTitle')}">🌾</span>`
     : '';
 
   const veganHtml = item.vegan
