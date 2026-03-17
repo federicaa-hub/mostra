@@ -409,7 +409,7 @@ body {
 .section--cervezas-litro .section-desc,
 .section--vinos          .section-desc,
 .section--sin-alcohol    .section-desc,
-.section--comida         .section-desc { color: rgba(255,255,255,0.8); }
+.section--comida         .section-desc { color: rgba(255,237,0,0.6); }
 
 .section--tragos         .item-name,
 .section--cervezas-litro .item-name,
