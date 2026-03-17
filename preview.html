@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>La Tribu Mostra · Preview</title>
+  <link rel="stylesheet" href="css/styles.css?v=9">
+  <style>
+    .preview-badge {
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: #ff8c00cc;
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      z-index: 999;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="preview-badge">⚡ Preview</div>
+
+  <!-- Header -->
+  <header class="menu-header">
+    <img class="header-logo" src="assets/logo.png" alt="La Tribu Mostra"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:none;width:clamp(140px,50vw,200px);height:clamp(140px,50vw,200px);border-radius:50%;background:linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#4169E1,#750787);align-items:center;justify-content:center;font-size:3rem;">🌈</div>
+  </header>
+
+  <!-- Menu content -->
+  <main id="content">
+
+    <!-- BEBIDAS -->
+    <div class="category-block">
+      <div class="category-heading">
+        <h2 class="cat-title">Bebidas</h2>
+      </div>
+      <div id="bebidas-content"></div>
+    </div>
+
+    <!-- COMIDA -->
+    <div class="category-block">
+<div class="category-heading">
+        <h2 class="cat-title">Comida</h2>
+      </div>
+      <div id="comida-content"></div>
+    </div>
+
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+// ── Mock data ────────────────────────────────────────────────────────────────
+
+const SECTIONS = [
+  { id: 'tragos',        name: 'Tragos',         description: 'Preparados con amor y mucho hielo', category: 'BEBIDAS', order: 1 },
+  { id: 'aperitivos',    name: 'Aperitivos',      description: null,                                category: 'BEBIDAS', order: 2 },
+  { id: 'cervezas-lata', name: 'Cervezas Lata',   description: null,                                category: 'BEBIDAS', order: 3 },
+  { id: 'cervezas-litro',name: 'Cervezas Litro',  description: null,                                category: 'BEBIDAS', order: 4 },
+  { id: 'vinos',         name: 'Vinos',           description: 'Copa y botella',                    category: 'BEBIDAS', order: 5 },
+  { id: 'sin-alcohol',   name: 'Sin Alcohol',     description: null,                                category: 'BEBIDAS', order: 6 },
+  { id: 'comida',        name: 'Para picar',      description: 'Ideal para acompañar',              category: 'COMIDA',  order: 7 },
+];
+
+const ITEMS = [
+  // Tragos
+  { sectionId: 'tragos', name: 'Aperol Spritz',      description: 'Aperol, prosecco, soda',        price: 2000, subsection: null,    order: 1 },
+  { sectionId: 'tragos', name: 'Negroni',             description: 'Gin, Campari, vermouth rosso',  price: 2200, subsection: null,    order: 2 },
+  { sectionId: 'tragos', name: 'Gin Tonic',           description: 'Gin, agua tónica, lima',        price: 2000, subsection: null,    order: 3 },
+  { sectionId: 'tragos', name: 'Fernet con Coca',     description: null,                            price: 1800, subsection: null,    order: 4 },
+  { sectionId: 'tragos', name: 'Campari Soda',        description: null,                            price: 1600, subsection: null,    order: 5 },
+  { sectionId: 'tragos', name: 'Clericó',             description: 'Vino blanco, frutas de estación', price: 1700, subsection: null, order: 6 },
+  { sectionId: 'tragos', name: 'Destornillador',      description: 'Vodka, jugo de naranja',        price: 1800, subsection: null,    order: 7 },
+
+  // Aperitivos
+  { sectionId: 'aperitivos', name: 'Campari',         description: null,                            price: 1400, subsection: null,    order: 1 },
+  { sectionId: 'aperitivos', name: 'Aperol',          description: null,                            price: 1400, subsection: null,    order: 2 },
+  { sectionId: 'aperitivos', name: 'Vermouth',        description: 'Con aceitunas',                 price: 1200, subsection: null,    order: 3 },
+  { sectionId: 'aperitivos', name: 'Cynar',           description: null,                            price: 1300, subsection: null,    order: 4 },
+
+  // Cervezas Lata
+  { sectionId: 'cervezas-lata', name: 'Stella Artois 473ml', description: null,                    price: 950,  subsection: null,    order: 1 },
+  { sectionId: 'cervezas-lata', name: 'Heineken 473ml',      description: null,                    price: 1000, subsection: null,    order: 2 },
+  { sectionId: 'cervezas-lata', name: 'Quilmes 473ml',       description: null,                    price: 850,  subsection: null,    order: 3 },
+  { sectionId: 'cervezas-lata', name: 'Corona 355ml',        description: null,                    price: 900,  subsection: null,    order: 4 },
+  { sectionId: 'cervezas-lata', name: 'Patagonia Weisse',    description: null,                    price: 1100, subsection: null,    order: 5 },
+
+  // Cervezas Litro
+  { sectionId: 'cervezas-litro', name: 'Stella Artois 1L',  description: null,                    price: 2500, subsection: null,    order: 1 },
+  { sectionId: 'cervezas-litro', name: 'Quilmes 1L',        description: null,                    price: 2200, subsection: null,    order: 2 },
+
+  // Vinos — con subsecciones
+  { sectionId: 'vinos', name: 'Copa Malbec',          description: 'Mendoza',                      price: 1600, subsection: 'Copas',    order: 1 },
+  { sectionId: 'vinos', name: 'Copa Chardonnay',      description: 'Valle de Uco',                 price: 1600, subsection: 'Copas',    order: 2 },
+  { sectionId: 'vinos', name: 'Copa Rosé',            description: null,                           price: 1500, subsection: 'Copas',    order: 3 },
+  { sectionId: 'vinos', name: 'Botella Malbec',       description: 'Achaval Ferrer',               price: 4500, subsection: 'Botellas', order: 4 },
+  { sectionId: 'vinos', name: 'Botella Chardonnay',   description: 'Clos de los Siete',            price: 4200, subsection: 'Botellas', order: 5 },
+
+  // Sin alcohol
+  { sectionId: 'sin-alcohol', name: 'Agua mineral',   description: 'Con o sin gas',                price: 500,  subsection: null,    order: 1 },
+  { sectionId: 'sin-alcohol', name: 'Gaseosa',        description: 'Coca, Sprite, Fanta',          price: 700,  subsection: null,    order: 2 },
+  { sectionId: 'sin-alcohol', name: 'Jugo de naranja',description: 'Exprimido',                    price: 900,  subsection: null,    order: 3 },
+  { sectionId: 'sin-alcohol', name: 'Tónica',         description: null,                           price: 600,  subsection: null,    order: 4 },
+
+  // Comida
+  { sectionId: 'comida', name: 'Tabla de fiambres',   description: 'Jamón crudo, salame, queso, aceitunas', price: 3500, subsection: null, order: 1 },
+  { sectionId: 'comida', name: 'Tostado',             description: 'Jamón y queso, en pan de miga',         price: 1800, subsection: null, order: 2 },
+  { sectionId: 'comida', name: 'Medialunas ×6',       description: null,                                     price: 1200, subsection: null, order: 3 },
+  { sectionId: 'comida', name: 'Empanadas ×3',        description: 'Carne cortada a cuchillo / caprese',     price: 1500, subsection: null, order: 4 },
+  { sectionId: 'comida', name: 'Papas fritas',        description: null,                                     price: 1400, subsection: null, order: 5 },
+];
+
+// ── Render ───────────────────────────────────────────────────────────────────
+
+function renderMenu() {
+  const bebidasEl = document.getElementById('bebidas-content');
+  const comidaEl  = document.getElementById('comida-content');
+
+  const sectionsMap = new Map(SECTIONS.map(s => [s.id, s]));
+
+  const bebidasSections = SECTIONS.filter(s => s.category === 'BEBIDAS').sort((a,b) => a.order - b.order);
+  const comidaSections  = SECTIONS.filter(s => s.category === 'COMIDA').sort((a,b) => a.order - b.order);
+
+  bebidasSections.forEach(s => renderSection(bebidasEl, s, ITEMS));
+  comidaSections.forEach(s  => renderSection(comidaEl,  s, ITEMS));
+}
+
+function renderSection(container, section, allItems) {
+  const items = allItems
+    .filter(i => i.sectionId === section.id)
+    .sort((a, b) => a.order - b.order);
+
+  if (items.length === 0) return;
+
+  const sectionEl = document.createElement('div');
+  sectionEl.className = 'menu-section';
+
+  const headerEl = document.createElement('div');
+  headerEl.className = 'section-header';
+  headerEl.innerHTML = `
+    <div class="section-name">${section.name}</div>
+    ${section.description ? `<div class="section-desc">${section.description}</div>` : ''}
+  `;
+  sectionEl.appendChild(headerEl);
+
+  let currentSub = Symbol('init');
+  let currentSubEl = null;
+
+  items.forEach(item => {
+    const sub = item.subsection ?? null;
+    if (sub !== currentSub) {
+      currentSub = sub;
+      if (sub) {
+        currentSubEl = document.createElement('div');
+        currentSubEl.className = 'subsection';
+        currentSubEl.innerHTML = `<div class="subsection-name">${sub}</div>`;
+        sectionEl.appendChild(currentSubEl);
+      } else {
+        currentSubEl = null;
+      }
+    }
+    (currentSubEl || sectionEl).appendChild(makeItemEl(item));
+  });
+
+  container.appendChild(sectionEl);
+}
+
+function makeItemEl(item) {
+  const el = document.createElement('div');
+  el.className = 'menu-item';
+
+  const priceHtml = item.price
+    ? `<span class="item-price">$${Number(item.price).toLocaleString('es-AR')}</span>`
+    : `<span class="item-price-empty">—</span>`;
+
+  const descHtml = item.description
+    ? `<span class="item-desc">${item.description}</span>`
+    : '';
+
+  el.innerHTML = `
+    <div class="item-info">
+      <span class="item-name">${item.name}</span>
+      ${descHtml}
+    </div>
+    ${priceHtml}
+  `;
+  return el;
+}
+
+renderMenu();
+</script>
+</body>
+</html>

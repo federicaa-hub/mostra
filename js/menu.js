@@ -132,20 +132,6 @@ function makeItemEl(item) {
   return el;
 }
 
-// ── Tabs ─────────────────────────────────────────────────────────────────────
-
-function setupTabs() {
-  document.querySelectorAll('.cat-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const target = tab.dataset.cat;
-      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.cat-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(`cat-${target}`).classList.add('active');
-    });
-  });
-}
-
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function hideLoading() {
@@ -162,5 +148,4 @@ function showError(msg) {
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 
-setupTabs();
 init();
