@@ -450,7 +450,7 @@ body {
   color: rgba(0,0,0,0.65);
 }
 .section-desc {
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   color: var(--muted);
   font-style: italic;
   line-height: 1.4;
