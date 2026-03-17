@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migración · Seed Miércoles</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div id="login-wrap" class="login-wrap">
+    <div class="login-card">
+      <h2 class="login-title" style="margin-bottom:0.5rem">Seed Miércoles</h2>
+      <p class="login-sub">Crea la sección "Miércoles" con la promo del día.</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email admin</label>
+          <input id="login-email" type="email" class="form-input" placeholder="admin@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input id="login-password" type="password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <p id="login-error" class="error-msg"></p>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="panel-wrap" class="seed-wrap" style="display:none">
+    <div class="seed-card">
+      <h2>Seed · Miércoles</h2>
+      <p>Crea la sección <strong>Miércoles</strong> y el siguiente ítem:</p>
+      <ul style="margin:0.75rem 0 1rem 1.25rem;font-size:0.9rem;color:#ccc;line-height:1.8">
+        <li>2 Tragos + Tostón — $10.000</li>
+      </ul>
+      <p style="font-size:0.8rem;color:#888;margin-bottom:1rem">
+        ⚠️ El ítem se crea como <strong>no disponible</strong>. Activalo desde el admin cada miércoles.
+      </p>
+      <button id="preview-btn" class="btn btn-ghost" style="width:100%;margin-bottom:0.5rem">
+        👁 Ver qué va a crearse
+      </button>
+      <button id="migrate-btn" class="btn btn-primary" style="width:100%" disabled>
+        Crear en Firestore
+      </button>
+      <div id="log" style="display:none;margin-top:1rem;font-family:monospace;font-size:0.8rem;background:#111;padding:1rem;border-radius:8px;max-height:300px;overflow-y:auto;color:#eee"></div>
+      <div id="done" style="display:none;margin-top:1rem">
+        <p style="color:#22c55e;font-weight:700">✓ Promo Miércoles creada.</p>
+        <a href="admin.html" class="btn btn-ghost" style="margin-top:0.75rem;display:inline-flex">Ir al admin</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, auth } from './js/firebase-config.js';
+    import {
+      collection, addDoc, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      signInWithEmailAndPassword, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, user => {
+      document.getElementById('login-wrap').style.display = user ? 'none' : 'flex';
+      document.getElementById('panel-wrap').style.display = user ? 'flex' : 'none';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Entrando…';
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById('login-email').value.trim(),
+          document.getElementById('login-password').value
+        );
+      } catch {
+        document.getElementById('login-error').textContent = 'Email o contraseña incorrectos.';
+        btn.disabled = false; btn.textContent = 'Entrar';
+      }
+    });
+
+    const SECTION = { name: 'Miércoles', category: 'PROMOCIONES', description: '', order: 10 };
+    const ITEMS = [
+      { name: '2 Tragos + Tostón', description: null, price: 10000, order: 10 },
+    ];
+
+    const logEl = document.getElementById('log');
+    function log(msg, color = '#eee') {
+      logEl.style.display = 'block';
+      const line = document.createElement('div');
+      line.style.color = color;
+      line.textContent = msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById('preview-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('preview-btn');
+      btn.disabled = true; btn.textContent = 'Verificando…';
+      logEl.innerHTML = '';
+
+      const existing = await getDocs(
+        query(collection(db, 'sections'), where('category', '==', 'PROMOCIONES'), where('name', '==', 'Miércoles'))
+      );
+      if (!existing.empty) {
+        log('⚠️ Ya existe una sección Miércoles. Si continuás, se crearán ítems duplicados.', '#facc15');
+      } else {
+        log('✓ No existe sección Miércoles → se creará.', '#86efac');
+      }
+      ITEMS.forEach(i => log(`  + ${i.name} — $${i.price.toLocaleString('es-AR')}`, '#eee'));
+      log('');
+      log('Presioná "Crear en Firestore" para confirmar.');
+      document.getElementById('migrate-btn').disabled = false;
+      btn.disabled = false; btn.textContent = '👁 Ver qué va a crearse';
+    });
+
+    document.getElementById('migrate-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('migrate-btn');
+      btn.disabled = true; btn.textContent = 'Creando…';
+      try {
+        const secRef = await addDoc(collection(db, 'sections'), SECTION);
+        log(`✓ Sección "${SECTION.name}" creada (id: ${secRef.id})`, '#86efac');
+
+        for (const item of ITEMS) {
+          await addDoc(collection(db, 'items'), {
+            ...item,
+            sectionId: secRef.id,
+            subsection: null,
+            available: false,
+          });
+          log(`  ✓ "${item.name}" creado (no disponible por defecto)`, '#86efac');
+        }
+        log('\nCompletado.', '#22c55e');
+        document.getElementById('done').style.display = 'block';
+      } catch (err) {
+        log(`✗ Error: ${err.message}`, '#f87171');
+        btn.disabled = false; btn.textContent = 'Crear en Firestore';
+      }
+    });
+  </script>
+</body>
+</html>
