@@ -217,9 +217,14 @@ function makeItemEl(item) {
     ? `<span class="item-desc">${item.description}</span>`
     : '';
 
+  const sinTaccHtml = item.sinTacc
+    ? `<span class="sin-tacc-badge" title="Sin TACC / Sin Gluten">SIN TACC</span>`
+    : '';
+
   el.innerHTML = `
     <div class="item-name-row">
       <span class="item-name">${item.name}</span>
+      ${sinTaccHtml}
       <span class="item-dots" aria-hidden="true"></span>
       ${priceHtml}
     </div>

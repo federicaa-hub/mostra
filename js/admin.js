@@ -204,8 +204,23 @@ function makeAdminItemEl(item) {
     <span class="price-display" title="Tap para editar precio">
       ${item.price ? '$' + Number(item.price).toLocaleString('es-AR') : '—'}
     </span>
+    <button class="btn-icon sin-tacc-btn${item.sinTacc ? ' active' : ''}" title="Sin TACC">🌾</button>
     <button class="btn-icon delete-btn" title="Eliminar ítem">🗑</button>
   `;
+
+  // Toggle sin TACC
+  el.querySelector('.sin-tacc-btn').addEventListener('click', async () => {
+    const newVal = !item.sinTacc;
+    try {
+      await updateDoc(doc(db, 'items', item.id), { sinTacc: newVal });
+      item.sinTacc = newVal;
+      el.querySelector('.sin-tacc-btn').classList.toggle('active', newVal);
+      showToast(newVal ? '🌾 Sin TACC activado' : 'Sin TACC desactivado');
+    } catch (err) {
+      console.error(err);
+      showToast('Error al actualizar', true);
+    }
+  });
 
   // Toggle availability
   el.querySelector('input[type="checkbox"]').addEventListener('change', async e => {
@@ -353,6 +368,7 @@ addItemForm.addEventListener('submit', async e => {
       description,
       price,
       available: true,
+      sinTacc: false,
       order: maxOrder + 10
     });
     modal.classList.add('hidden');
