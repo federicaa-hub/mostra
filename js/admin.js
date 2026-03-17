@@ -213,9 +213,11 @@ function makeAdminItemEl(item) {
     <span class="price-display" title="Tap para editar precio">
       ${item.price ? '$' + Number(item.price).toLocaleString('es-AR') : '—'}
     </span>
-    <button class="btn-icon sin-tacc-btn${item.sinTacc ? ' active' : ''}" title="Sin TACC">🌾</button>
-    <button class="btn-icon vegan-btn${item.vegan ? ' active' : ''}" title="Vegano">🌱</button>
-    <button class="btn-icon delete-btn" title="Eliminar ítem">🗑</button>
+    <div class="admin-item-actions">
+      <button class="btn-icon sin-tacc-btn${item.sinTacc ? ' active' : ''}" title="Sin TACC">🌾</button>
+      <button class="btn-icon vegan-btn${item.vegan ? ' active' : ''}" title="Vegano">🌱</button>
+      <button class="btn-icon delete-btn" title="Eliminar ítem">🗑</button>
+    </div>
   `;
 
   // Toggle sin TACC
