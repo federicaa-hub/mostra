@@ -75,6 +75,7 @@ async function loadData() {
   const snap = await getDocs(query(collection(db, 'sections'), orderBy('order')));
   sections = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   populateSectionFilter();
+  renderPromoSections();
 
   // Real-time items
   unsubItems = onSnapshot(
@@ -358,6 +359,84 @@ addItemForm.addEventListener('submit', async e => {
     submitBtn.disabled = false;
   }
 });
+
+// ── Promo section management ──────────────────────────────────────────────────
+
+document.getElementById('promo-mgmt-toggle').addEventListener('click', () => {
+  const body  = document.getElementById('promo-mgmt-body');
+  const arrow = document.getElementById('promo-mgmt-arrow');
+  const open  = body.classList.toggle('hidden');
+  arrow.textContent = open ? '▾' : '▴';
+});
+
+function renderPromoSections() {
+  const list      = document.getElementById('promo-sections-list');
+  const promoSecs = sections.filter(s => s.category === 'PROMOCIONES');
+
+  if (promoSecs.length === 0) {
+    list.innerHTML = '<p class="promo-empty">Sin secciones de promo. Creá una arriba.</p>';
+    return;
+  }
+
+  list.innerHTML = '';
+  promoSecs.forEach(sec => {
+    const el = document.createElement('div');
+    el.className = 'promo-section-row';
+    el.innerHTML = `
+      <span class="promo-section-name">${sec.name}</span>
+      <button class="btn-icon delete-promo-btn" data-id="${sec.id}" title="Eliminar sección">🗑</button>
+    `;
+    el.querySelector('.delete-promo-btn').addEventListener('click', () => deletePromoSection(sec));
+    list.appendChild(el);
+  });
+}
+
+async function reloadSections() {
+  const snap = await getDocs(query(collection(db, 'sections'), orderBy('order')));
+  sections = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  populateSectionFilter();
+  renderPromoSections();
+}
+
+document.getElementById('add-promo-section-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nameInput = document.getElementById('promo-section-name');
+  const name      = nameInput.value.trim();
+  if (!name) return;
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+
+  try {
+    await addDoc(collection(db, 'sections'), {
+      name,
+      category:    'PROMOCIONES',
+      description: '',
+      order:       0
+    });
+    nameInput.value = '';
+    await reloadSections();
+    showToast('✓ Sección de promo creada');
+  } catch (err) {
+    console.error(err);
+    showToast('Error al crear sección', true);
+  }
+  btn.disabled = false;
+});
+
+async function deletePromoSection(sec) {
+  if (!confirm(`¿Eliminar la sección "${sec.name}"?\nTambién se eliminarán todos sus ítems.`)) return;
+  try {
+    const itemsInSection = allItems.filter(i => i.sectionId === sec.id);
+    await Promise.all(itemsInSection.map(i => deleteDoc(doc(db, 'items', i.id))));
+    await deleteDoc(doc(db, 'sections', sec.id));
+    await reloadSections();
+    showToast('Sección eliminada');
+  } catch (err) {
+    console.error(err);
+    showToast('Error al eliminar', true);
+  }
+}
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
 

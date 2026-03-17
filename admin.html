@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0a">
   <title>Admin · La Tribu Mostra</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/styles.css?v=2">
+  <link rel="stylesheet" href="css/styles.css?v=26">
 </head>
 <body>
 
@@ -92,6 +92,21 @@
       </button>
     </div>
 
+    <!-- Promo sections management -->
+    <div class="promo-mgmt">
+      <button id="promo-mgmt-toggle" class="promo-mgmt-toggle">
+        🏷️ Secciones de promo <span id="promo-mgmt-arrow">▾</span>
+      </button>
+      <div id="promo-mgmt-body" class="promo-mgmt-body hidden">
+        <form id="add-promo-section-form" class="promo-add-form">
+          <input id="promo-section-name" type="text" class="form-input"
+                 placeholder="Nombre (ej: 2×1 Cervezas)" required>
+          <button type="submit" class="btn btn-primary">＋ Crear</button>
+        </form>
+        <div id="promo-sections-list" class="promo-sections-list"></div>
+      </div>
+    </div>
+
     <!-- Items list -->
     <div id="admin-list" class="admin-list">
       <div class="loading">
@@ -174,6 +189,6 @@
   <!-- Toast -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/admin.js?v=2"></script>
+  <script type="module" src="js/admin.js?v=3"></script>
 </body>
 </html>
