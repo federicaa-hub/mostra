@@ -425,11 +425,9 @@ body {
   border-radius: 50%;
 }
 
-/* El padding inferior va dentro de la última sección para que el color la cubra */
+/* El padding inferior lo absorbe el footer */
 .category-block:last-child { padding-bottom: 0; }
-.category-block:last-child .menu-section:last-child {
-  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
-}
+.category-block:last-child .menu-section:last-child { padding-bottom: 0; }
 
 /* Menu section */
 .menu-section { margin-bottom: 0; }
@@ -1311,7 +1309,7 @@ textarea.form-input {
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 .site-footer {
-  margin-top: 3rem;
+  margin-top: 0;
   border-top: 3px solid transparent;
   border-image: var(--rainbow) 1;
   background: var(--card-bg);
@@ -1343,4 +1341,15 @@ textarea.form-input {
   height: auto;
   display: block;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.footer-credit {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+}
+.footer-credit strong {
+  color: var(--text);
+  font-weight: 700;
 }
