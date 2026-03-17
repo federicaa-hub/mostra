@@ -95,8 +95,9 @@
       logEl.scrollTop = logEl.scrollHeight;
     }
 
-    const FLAVORS_TO_DELETE = ['Pomelo', 'Naranja', 'Lima Limón', 'Granadina'];
-    const NEW_DESCRIPTION = 'Pomelo / Naranja / Lima Limón / Granadina';
+    const FLAVORS_TO_DELETE  = ['Pomelo', 'Naranja', 'Lima Limón']; // se eliminan
+    const FLAVORS_TO_STANDALONE = ['Granadina'];                    // pasan a standalone
+    const NEW_DESCRIPTION = 'Pomelo / Naranja / Lima Limón';
 
     async function getPaniza() {
       const q = query(
@@ -108,10 +109,9 @@
       return snap.docs;
     }
 
-    async function getFlavorItems() {
-      // Query each flavor separately and collect results
+    async function getFlavorItems(names) {
       const results = [];
-      for (const flavor of FLAVORS_TO_DELETE) {
+      for (const flavor of names) {
         const q = query(
           collection(db, 'items'),
           where('sectionId', '==', 'sin-alcohol'),
@@ -129,28 +129,34 @@
       logEl.innerHTML = '';
 
       try {
-        const [panizaDocs, flavorDocs] = await Promise.all([getPaniza(), getFlavorItems()]);
+        const [panizaDocs, deleteDocs, standaloneDocs] = await Promise.all([
+          getPaniza(),
+          getFlavorItems(FLAVORS_TO_DELETE),
+          getFlavorItems(FLAVORS_TO_STANDALONE)
+        ]);
 
         if (panizaDocs.length === 0) {
           log('⚠️ No se encontró el ítem "Paniza" en sin-alcohol.', '#facc15');
         } else {
           log('ACTUALIZAR:');
           panizaDocs.forEach(d => {
-            log(`  • "${d.data().name}" → description: "${NEW_DESCRIPTION}"`, '#86efac');
+            log(`  • "Paniza" → description: "${NEW_DESCRIPTION}"`, '#86efac');
           });
         }
 
         log('');
-        if (flavorDocs.length === 0) {
-          log('⚠️ No se encontraron ítems de sabores para eliminar.', '#facc15');
-        } else {
-          log(`ELIMINAR (${flavorDocs.length} ítems):`);
-          flavorDocs.forEach(d => {
-            log(`  • "${d.data().name}"`, '#fca5a5');
-          });
+        if (deleteDocs.length > 0) {
+          log(`ELIMINAR (${deleteDocs.length} ítems):`);
+          deleteDocs.forEach(d => log(`  • "${d.data().name}"`, '#fca5a5'));
         }
 
-        if (panizaDocs.length > 0 || flavorDocs.length > 0) {
+        if (standaloneDocs.length > 0) {
+          log('');
+          log('MOVER A STANDALONE (subsection → null):');
+          standaloneDocs.forEach(d => log(`  • "${d.data().name}"`, '#fde68a'));
+        }
+
+        if (panizaDocs.length > 0 || deleteDocs.length > 0 || standaloneDocs.length > 0) {
           log('');
           log('Presioná "Aplicar cambios" para confirmar.');
           document.getElementById('migrate-btn').disabled = false;
@@ -167,22 +173,26 @@
       btn.disabled = true; btn.textContent = 'Aplicando…';
 
       try {
-        const [panizaDocs, flavorDocs] = await Promise.all([getPaniza(), getFlavorItems()]);
-        let ok = 0, deleted = 0;
+        const [panizaDocs, deleteDocs, standaloneDocs] = await Promise.all([
+          getPaniza(),
+          getFlavorItems(FLAVORS_TO_DELETE),
+          getFlavorItems(FLAVORS_TO_STANDALONE)
+        ]);
+        let ok = 0, deleted = 0, moved = 0;
 
         // Update Paniza description
         for (const d of panizaDocs) {
           try {
             await updateDoc(d.ref, { description: NEW_DESCRIPTION });
-            log(`  ✓ Actualizado: "${d.data().name}"`, '#86efac');
+            log(`  ✓ Actualizado: "Paniza"`, '#86efac');
             ok++;
           } catch (err) {
-            log(`  ✗ Error actualizando "${d.data().name}": ${err.message}`, '#f87171');
+            log(`  ✗ Error actualizando "Paniza": ${err.message}`, '#f87171');
           }
         }
 
         // Delete flavor items
-        for (const d of flavorDocs) {
+        for (const d of deleteDocs) {
           try {
             await deleteDoc(d.ref);
             log(`  ✓ Eliminado: "${d.data().name}"`, '#86efac');
@@ -192,8 +202,19 @@
           }
         }
 
+        // Move Granadina to standalone
+        for (const d of standaloneDocs) {
+          try {
+            await updateDoc(d.ref, { subsection: null });
+            log(`  ✓ Standalone: "${d.data().name}"`, '#86efac');
+            moved++;
+          } catch (err) {
+            log(`  ✗ Error moviendo "${d.data().name}": ${err.message}`, '#f87171');
+          }
+        }
+
         log('');
-        log(`Completado: ${ok} actualizado(s), ${deleted} eliminado(s).`, '#22c55e');
+        log(`Completado: ${ok} actualizado(s), ${deleted} eliminado(s), ${moved} movido(s) a standalone.`, '#22c55e');
         document.getElementById('done').style.display = 'block';
       } catch (err) {
         log(`✗ Error inesperado: ${err.message}`, '#f87171');
