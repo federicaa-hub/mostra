@@ -405,7 +405,8 @@ body {
 #promociones-content .section-header { display: none; }
 
 /* Texto para fondos OSCUROS (rojo, azul, violeta, verde) → blanco */
-.section--tragos         .section-desc,
+.section--tragos         .section-desc { color: rgba(255,237,0,0.6); }
+
 .section--cervezas-litro .section-desc,
 .section--vinos          .section-desc,
 .section--sin-alcohol    .section-desc,
