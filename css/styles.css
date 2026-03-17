@@ -371,7 +371,7 @@ body {
 .section-header::before { display: none; }
 .section-name {
   font-family: 'FreeRansomNotes', cursive;
-  font-size: clamp(3.8rem, 11vw, 5rem);
+  font-size: clamp(3.2rem, 9vw, 4.2rem);
   letter-spacing: 3px;
   color: #fff;
   line-height: 1.1;
@@ -453,7 +453,8 @@ body {
   font-size: 1.05rem;
   color: var(--muted);
   font-style: italic;
-  line-height: 1.4;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 .section-desc::before { content: '('; }
 .section-desc::after  { content: ')'; }
@@ -473,6 +474,7 @@ body {
   text-transform: uppercase;
   color: var(--faint);
   padding: 0.8rem 1.25rem 0.2rem;
+  line-height: 1.2;
 }
 
 /* Menu item row */
@@ -493,12 +495,13 @@ body {
   font-size: 1.05rem;
   font-weight: 800;
   color: var(--text);
-  line-height: 1.3;
+  line-height: 1.4;
 }
 .item-desc {
   font-size: 1.05rem;
   color: var(--muted);
   margin-top: 0.1rem;
+  line-height: 1.4;
 }
 .item-price {
   font-weight: 800;
