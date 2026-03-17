@@ -961,7 +961,7 @@ body {
   margin-bottom: 0.75rem;
 }
 .promo-add-form .form-input { flex: 1; margin-bottom: 0; }
-.promo-add-form .btn { white-space: nowrap; padding: 0.6rem 1rem; }
+.promo-add-form .btn { white-space: nowrap; padding: 0.6rem 1rem; width: auto; }
 .promo-sections-list { display: flex; flex-direction: column; gap: 0.4rem; }
 .promo-section-row {
   display: flex;
