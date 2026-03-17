@@ -371,9 +371,10 @@ body {
 .section-header::before { display: none; }
 .section-name {
   font-family: 'FreeRansomNotes', cursive;
-  font-size: 2.9rem;
+  font-size: clamp(3.8rem, 11vw, 5rem);
   letter-spacing: 3px;
-  color: #fff;  line-height: 1.1;
+  color: #fff;
+  line-height: 1.1;
 }
 
 /* ── Colores por sección (bandera LGBT+) ─────────────── */
