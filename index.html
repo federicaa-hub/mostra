@@ -9,14 +9,27 @@
   <link rel="apple-touch-icon" href="assets/logo.png">
   <title>La Tribu Mostra · Carta</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/styles.css?v=23">
+  <link rel="stylesheet" href="css/styles.css?v=24">
 </head>
 <body>
+
+  <!-- Floating search toggle -->
+  <button id="search-toggle" class="search-toggle" aria-label="Buscar en el menú">🔍</button>
 
   <!-- Header -->
   <header class="menu-header">
     <img class="header-logo" src="assets/logo.png" alt="La Tribu Mostra">
   </header>
+
+  <!-- Search bar (hidden by default, sticky) -->
+  <div id="search-bar" class="search-bar" aria-hidden="true">
+    <div class="search-inner">
+      <input id="search-input" type="text" class="search-input"
+             placeholder="Buscar en el menú…" autocomplete="off" spellcheck="false">
+      <button id="search-close" class="search-close" aria-label="Cerrar buscador">✕</button>
+    </div>
+    <p id="search-empty" class="search-empty" style="display:none">No se encuentra</p>
+  </div>
 
   <!-- Loading state -->
   <div id="loading" class="loading">
@@ -48,6 +61,6 @@
   <!-- Toast notification (for errors only, not shown in guest mode) -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/menu.js?v=4"></script>
+  <script type="module" src="js/menu.js?v=5"></script>
 </body>
 </html>

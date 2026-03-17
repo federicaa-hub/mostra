@@ -827,3 +827,97 @@ body {
   line-height: 1.6;
 }
 #seed-log .log-error { color: #ff4c4c; }
+
+/* ========================
+   SEARCH — index.html
+   ======================== */
+
+/* Floating toggle button */
+.search-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 200;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--yellow);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  transition: transform 0.15s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.search-toggle:hover  { transform: scale(1.1); }
+.search-toggle.active { background: var(--violet); }
+
+/* Sticky search bar */
+.search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #1a0000;
+  border-bottom: 2px solid var(--red);
+  overflow: hidden;
+  max-height: 0;
+  padding: 0 1rem;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.search-bar.open {
+  max-height: 110px;
+  padding: 0.75rem 1rem;
+}
+
+/* Inner row: input + close button */
+.search-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2d0000;
+  border: 1.5px solid var(--red);
+  border-radius: 10px;
+  padding: 0.45rem 0.75rem;
+}
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 0;
+}
+.search-input::placeholder {
+  color: rgba(255,255,255,0.35);
+  font-weight: 400;
+}
+.search-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.55);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.15rem;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.search-close:hover { color: #fff; }
+
+/* "No se encuentra" message */
+.search-empty {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--yellow);
+  text-align: center;
+  margin-top: 0.55rem;
+  letter-spacing: 0.02em;
+}

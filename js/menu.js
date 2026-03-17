@@ -7,11 +7,14 @@ import {
   getDocs,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initSearch, applyFilter, getCurrentQuery } from './search.js';
 
 // Map of sectionId → section data (fetched once)
 const sections = new Map();
 
 // ── Initialization ──────────────────────────────────────────────────────────
+
+let searchReady = false;
 
 async function init() {
   try {
@@ -26,6 +29,14 @@ async function init() {
       const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderMenu(items);
       hideLoading();
+
+      // Init search once after first render; re-apply filter on subsequent renders
+      if (!searchReady) {
+        initSearch();
+        searchReady = true;
+      } else {
+        applyFilter(getCurrentQuery());
+      }
     }, err => {
       console.error('Error loading items:', err);
       showError('No se pudo cargar el menú. Recargá la página.');
