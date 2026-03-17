@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migrar Aperitivos</title>
+  <style>
+    body { font-family: monospace; background: #0a0a0a; color: #f0f0f0; padding: 2rem; }
+    h2   { color: #FF8C00; margin-bottom: 1rem; }
+    .form-group { margin-bottom: 0.75rem; }
+    input {
+      background: #111; border: 1px solid #333; border-radius: 6px;
+      padding: 0.5rem 0.75rem; color: #f0f0f0; font-family: monospace;
+      font-size: 0.9rem; width: 260px; display: block; margin-top: 0.25rem;
+    }
+    button {
+      margin-top: 1rem; padding: 0.6rem 1.5rem; background: #FF8C00;
+      border: none; border-radius: 6px; color: #000; font-weight: 700;
+      font-size: 0.9rem; cursor: pointer;
+    }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    #log {
+      margin-top: 1.5rem; background: #050505; border: 1px solid #222;
+      border-radius: 8px; padding: 1rem; line-height: 1.7;
+      font-size: 0.8rem; max-height: 400px; overflow-y: auto;
+    }
+    .ok  { color: #22c55e; }
+    .err { color: #ff4c4c; }
+    .inf { color: #888; }
+  </style>
+</head>
+<body>
+
+<h2>🍊 Migrar sección Aperitivos</h2>
+
+<div id="login-section">
+  <div class="form-group">
+    <label>Email admin</label>
+    <input id="email" type="email" placeholder="admin@email.com">
+  </div>
+  <div class="form-group">
+    <label>Contraseña</label>
+    <input id="password" type="password" placeholder="••••••••">
+  </div>
+  <button id="run-btn" onclick="runMigration()">Ejecutar migración</button>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, query, where, getDocs, deleteDoc, addDoc, doc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyAjxfYqvF4-sF-6gY2f7INgp2Gs2adcf98",
+  authDomain:        "tribu-mostra.firebaseapp.com",
+  projectId:         "tribu-mostra",
+  storageBucket:     "tribu-mostra.firebasestorage.app",
+  messagingSenderId: "835616814810",
+  appId:             "1:835616814810:web:942597d49975f29422d7e3"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const NUEVOS_ITEMS = [
+  { name: 'Cynar',          order: 1 },
+  { name: 'Aperol',         order: 2 },
+  { name: 'Amargo Obrero',  order: 3 },
+  { name: 'Campari',        order: 4 },
+  { name: 'Vermu Cinzano',  order: 5 },
+  { name: 'Vermu Vecino',   order: 6 },
+  { name: 'Vermu La fuerza',order: 7 },
+];
+
+function log(msg, type = 'inf') {
+  const el = document.getElementById('log');
+  el.innerHTML += `<div class="${type}">${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+window.runMigration = async function () {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('run-btn');
+
+  if (!email || !password) { alert('Completá email y contraseña.'); return; }
+
+  btn.disabled = true;
+  document.getElementById('log').innerHTML = '';
+
+  try {
+    // 1. Login
+    log('🔑 Iniciando sesión…');
+    await signInWithEmailAndPassword(auth, email, password);
+    log('✅ Autenticado.', 'ok');
+
+    // 2. Buscar ítems actuales de aperitivos
+    log('🔍 Buscando ítems actuales de aperitivos…');
+    const snap = await getDocs(
+      query(collection(db, 'items'), where('sectionId', '==', 'aperitivos'))
+    );
+    log(`📋 Se encontraron ${snap.size} ítem(s) existentes.`, 'inf');
+
+    // 3. Borrar todos los existentes
+    let deleted = 0;
+    for (const d of snap.docs) {
+      await deleteDoc(doc(db, 'items', d.id));
+      log(`🗑  Eliminado: "${d.data().name}"`, 'inf');
+      deleted++;
+    }
+    log(`✅ ${deleted} ítem(s) eliminados.`, 'ok');
+
+    // 4. Insertar la nueva lista
+    log('➕ Insertando nueva lista…');
+    for (const item of NUEVOS_ITEMS) {
+      await addDoc(collection(db, 'items'), {
+        sectionId:  'aperitivos',
+        name:       item.name,
+        order:      item.order,
+        available:  true,
+        subsection: null,
+        description:'',
+        price:      null,
+      });
+      log(`✅ Agregado: "${item.name}"`, 'ok');
+    }
+
+    log('', 'inf');
+    log('🎉 Migración completada. Podés cerrar esta página.', 'ok');
+  } catch (err) {
+    log(`❌ Error: ${err.message}`, 'err');
+    btn.disabled = false;
+  }
+};
+</script>
+
+</body>
+</html>
