@@ -301,13 +301,24 @@ body {
 
 /* Header */
 .menu-header {
-  background: #0a0a0a;
-  padding: 2rem 1.25rem;
+  position: relative;
+  background: #0a0a0a url('../assets/mostra-banner.png') center center / cover no-repeat;
+  padding: 2.5rem 1.25rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+}
+.menu-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 0;
 }
 .header-logo {
+  position: relative;
+  z-index: 1;
   width: clamp(140px, 50vw, 200px);
   height: clamp(140px, 50vw, 200px);
   object-fit: cover;
