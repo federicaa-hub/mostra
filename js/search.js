@@ -1,6 +1,12 @@
 // ── Search module ─────────────────────────────────────────────────────────────
 // Provides initSearch() + applyFilter(query) for the public menu.
 
+// Sinónimos: lo que escribe el usuario → término real a buscar
+const SYNONYMS = {
+  'birra':    'cerveza',
+  'birras':   'cerveza',
+};
+
 let _query = '';
 
 export function getCurrentQuery() {
@@ -8,7 +14,8 @@ export function getCurrentQuery() {
 }
 
 export function applyFilter(query) {
-  _query = (query || '').trim().toLowerCase();
+  const raw = (query || '').trim().toLowerCase();
+  _query = SYNONYMS[raw] ?? raw;
 
   // ── Reset all visibility ──────────────────────────────────────────────────
   document.querySelectorAll(
