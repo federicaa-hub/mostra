@@ -712,35 +712,72 @@ body {
 
 .admin-header {
   background: #0d0d0d;
-  padding: 0.8rem 1rem;
-  display: flex;
+  padding: 0.65rem 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
 }
-.admin-header-left {
+.admin-header-center {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.admin-logo-sm {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 .admin-badge {
-  background: var(--rainbow);
   color: #fff;
   font-family: 'Bangers', cursive;
-  font-size: 0.72rem;
-  letter-spacing: 1.5px;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
 }
-.admin-site-name {
-  font-family: 'Bangers', cursive;
-  font-size: 1rem;
-  letter-spacing: 1px;
+.admin-header-right {
+  display: flex;
+  justify-content: flex-end;
+}
+.admin-search-input {
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  width: 100%;
+  max-width: 130px;
+  outline: none;
+  transition: border-color 0.2s, max-width 0.25s;
+  -webkit-appearance: none;
+}
+.admin-search-input:focus {
+  border-color: var(--orange);
+  max-width: 170px;
+}
+.admin-search-input::-webkit-search-cancel-button { display: none; }
+.btn-logout-sm {
+  background: transparent;
+  border: none;
   color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  justify-self: start;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
+.btn-logout-sm:hover { color: var(--text); }
 
 .admin-filters {
   padding: 0.65rem 0.75rem;
