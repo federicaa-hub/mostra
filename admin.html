@@ -195,6 +195,43 @@
     </div>
   </div>
 
+  <!-- ── Edit item modal ────────────────────────────────── -->
+  <div id="edit-item-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-item-modal-title">
+    <div class="modal">
+      <h3 class="modal-title" id="edit-item-modal-title">Editar Ítem</h3>
+
+      <form id="edit-item-form" autocomplete="off">
+
+        <div class="form-group">
+          <label class="form-label" for="edit-item-name">Nombre *</label>
+          <input id="edit-item-name" type="text" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-item-subsection">
+            Subsección <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <input id="edit-item-subsection" type="text" class="form-input"
+                 placeholder="ej: Rubias, IPA, Empanadas…">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-item-description">
+            Descripción <span style="color:#555;font-weight:400">(opcional)</span>
+          </label>
+          <input id="edit-item-description" type="text" class="form-input"
+                 placeholder="ej: Con ensalada, Vegana…">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="close-edit-item-btn" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="width:auto;flex:1">Guardar</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
   <!-- ── Edit promo modal ───────────────────────────────── -->
   <div id="edit-promo-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-promo-modal-title">
     <div class="modal">

@@ -219,6 +219,7 @@ function makeAdminItemEl(item) {
     <div class="admin-item-actions">
       <button class="btn-icon sin-tacc-btn${item.sinTacc ? ' active' : ''}" title="Sin TACC">🌾</button>
       <button class="btn-icon vegan-btn${item.vegan ? ' active' : ''}" title="Vegano">🌱</button>
+      <button class="btn-icon edit-btn" title="Editar ítem">✏️</button>
       <button class="btn-icon delete-btn" title="Eliminar ítem">🗑</button>
     </div>
   `;
@@ -270,6 +271,9 @@ function makeAdminItemEl(item) {
   el.querySelector('.price-display').addEventListener('click', function () {
     startEditPrice(item.id, item.price, this);
   });
+
+  // Edit
+  el.querySelector('.edit-btn').addEventListener('click', () => openEditItem(item));
 
   // Delete
   el.querySelector('.delete-btn').addEventListener('click', () => doDelete(item));
@@ -568,6 +572,56 @@ document.getElementById('edit-promo-form').addEventListener('submit', async e =>
     editingPromoId = null;
     await reloadSections();
     showToast('✓ Promo actualizada');
+  } catch (err) {
+    console.error(err);
+    showToast('Error al guardar', true);
+  }
+  btn.disabled = false;
+});
+
+// ── Edit item modal ───────────────────────────────────────────────────────────
+
+let editingItemId = null;
+
+function openEditItem(item) {
+  editingItemId = item.id;
+  document.getElementById('edit-item-name').value        = item.name        || '';
+  document.getElementById('edit-item-subsection').value  = item.subsection  || '';
+  document.getElementById('edit-item-description').value = item.description || '';
+  document.getElementById('edit-item-modal').classList.remove('hidden');
+}
+
+document.getElementById('close-edit-item-btn').addEventListener('click', () => {
+  document.getElementById('edit-item-modal').classList.add('hidden');
+  editingItemId = null;
+});
+
+document.getElementById('edit-item-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('edit-item-modal')) {
+    document.getElementById('edit-item-modal').classList.add('hidden');
+    editingItemId = null;
+  }
+});
+
+document.getElementById('edit-item-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!editingItemId) return;
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+
+  const name = document.getElementById('edit-item-name').value.trim();
+  if (!name) { btn.disabled = false; return; }
+
+  try {
+    await updateDoc(doc(db, 'items', editingItemId), {
+      name,
+      subsection:  document.getElementById('edit-item-subsection').value.trim()  || null,
+      description: document.getElementById('edit-item-description').value.trim() || null,
+    });
+    document.getElementById('edit-item-modal').classList.add('hidden');
+    editingItemId = null;
+    showToast('✓ Ítem actualizado');
   } catch (err) {
     console.error(err);
     showToast('Error al guardar', true);
