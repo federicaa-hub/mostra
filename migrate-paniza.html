@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migración · Paniza con sabores como descripción</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Login -->
+  <div id="login-wrap" class="login-wrap">
+    <div class="login-card">
+      <h2 class="login-title" style="margin-bottom:0.5rem">Migración</h2>
+      <p class="login-sub">
+        Consolida los sabores de Paniza en una descripción<br>
+        y elimina los ítems sueltos de Pomelo, Naranja, etc.
+      </p>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email admin</label>
+          <input id="login-email" type="email" class="form-input" placeholder="admin@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input id="login-password" type="password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <p id="login-error" class="error-msg"></p>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel -->
+  <div id="panel-wrap" class="seed-wrap" style="display:none">
+    <div class="seed-card">
+      <h2>Paniza → descripción con sabores</h2>
+      <p>
+        Hace dos cosas:<br>
+        1. Actualiza <strong>Paniza</strong> → description: <em>"Pomelo / Naranja / Lima Limón / Granadina"</em><br>
+        2. Elimina los ítems sueltos: <strong>Pomelo, Naranja, Lima Limón, Granadina</strong><br><br>
+        ⚠️ La eliminación es <strong>permanente</strong>. Revisá primero.
+      </p>
+      <button id="preview-btn" class="btn btn-ghost" style="width:100%;margin-bottom:0.5rem">
+        👁 Ver qué va a cambiar
+      </button>
+      <button id="migrate-btn" class="btn btn-primary" style="width:100%" disabled>
+        Aplicar cambios
+      </button>
+      <div id="log" style="display:none;margin-top:1rem;font-family:monospace;font-size:0.8rem;background:#111;padding:1rem;border-radius:8px;max-height:300px;overflow-y:auto;color:#eee"></div>
+      <div id="done" style="display:none;margin-top:1rem">
+        <p style="color:#22c55e;font-weight:700">✓ Migración completada.</p>
+        <a href="index.html" class="btn btn-ghost" style="margin-top:0.75rem;display:inline-flex">Ver carta</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, auth } from './js/firebase-config.js';
+    import {
+      collection, query, where, getDocs, updateDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      signInWithEmailAndPassword, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, user => {
+      document.getElementById('login-wrap').style.display = user ? 'none' : 'flex';
+      document.getElementById('panel-wrap').style.display = user ? 'flex' : 'none';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Entrando…';
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById('login-email').value.trim(),
+          document.getElementById('login-password').value
+        );
+      } catch {
+        document.getElementById('login-error').textContent = 'Email o contraseña incorrectos.';
+        btn.disabled = false; btn.textContent = 'Entrar';
+      }
+    });
+
+    const logEl = document.getElementById('log');
+    function log(msg, color = '#eee') {
+      logEl.style.display = 'block';
+      const line = document.createElement('div');
+      line.style.color = color;
+      line.textContent = msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    const FLAVORS_TO_DELETE = ['Pomelo', 'Naranja', 'Lima Limón', 'Granadina'];
+    const NEW_DESCRIPTION = 'Pomelo / Naranja / Lima Limón / Granadina';
+
+    async function getPaniza() {
+      const q = query(
+        collection(db, 'items'),
+        where('sectionId', '==', 'sin-alcohol'),
+        where('name', '==', 'Paniza')
+      );
+      const snap = await getDocs(q);
+      return snap.docs;
+    }
+
+    async function getFlavorItems() {
+      // Query each flavor separately and collect results
+      const results = [];
+      for (const flavor of FLAVORS_TO_DELETE) {
+        const q = query(
+          collection(db, 'items'),
+          where('sectionId', '==', 'sin-alcohol'),
+          where('name', '==', flavor)
+        );
+        const snap = await getDocs(q);
+        snap.docs.forEach(d => results.push(d));
+      }
+      return results;
+    }
+
+    document.getElementById('preview-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('preview-btn');
+      btn.disabled = true; btn.textContent = 'Buscando…';
+      logEl.innerHTML = '';
+
+      try {
+        const [panizaDocs, flavorDocs] = await Promise.all([getPaniza(), getFlavorItems()]);
+
+        if (panizaDocs.length === 0) {
+          log('⚠️ No se encontró el ítem "Paniza" en sin-alcohol.', '#facc15');
+        } else {
+          log('ACTUALIZAR:');
+          panizaDocs.forEach(d => {
+            log(`  • "${d.data().name}" → description: "${NEW_DESCRIPTION}"`, '#86efac');
+          });
+        }
+
+        log('');
+        if (flavorDocs.length === 0) {
+          log('⚠️ No se encontraron ítems de sabores para eliminar.', '#facc15');
+        } else {
+          log(`ELIMINAR (${flavorDocs.length} ítems):`);
+          flavorDocs.forEach(d => {
+            log(`  • "${d.data().name}"`, '#fca5a5');
+          });
+        }
+
+        if (panizaDocs.length > 0 || flavorDocs.length > 0) {
+          log('');
+          log('Presioná "Aplicar cambios" para confirmar.');
+          document.getElementById('migrate-btn').disabled = false;
+        }
+      } catch (err) {
+        log(`✗ Error: ${err.message}`, '#f87171');
+      }
+
+      btn.disabled = false; btn.textContent = '👁 Ver qué va a cambiar';
+    });
+
+    document.getElementById('migrate-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('migrate-btn');
+      btn.disabled = true; btn.textContent = 'Aplicando…';
+
+      try {
+        const [panizaDocs, flavorDocs] = await Promise.all([getPaniza(), getFlavorItems()]);
+        let ok = 0, deleted = 0;
+
+        // Update Paniza description
+        for (const d of panizaDocs) {
+          try {
+            await updateDoc(d.ref, { description: NEW_DESCRIPTION });
+            log(`  ✓ Actualizado: "${d.data().name}"`, '#86efac');
+            ok++;
+          } catch (err) {
+            log(`  ✗ Error actualizando "${d.data().name}": ${err.message}`, '#f87171');
+          }
+        }
+
+        // Delete flavor items
+        for (const d of flavorDocs) {
+          try {
+            await deleteDoc(d.ref);
+            log(`  ✓ Eliminado: "${d.data().name}"`, '#86efac');
+            deleted++;
+          } catch (err) {
+            log(`  ✗ Error eliminando "${d.data().name}": ${err.message}`, '#f87171');
+          }
+        }
+
+        log('');
+        log(`Completado: ${ok} actualizado(s), ${deleted} eliminado(s).`, '#22c55e');
+        document.getElementById('done').style.display = 'block';
+      } catch (err) {
+        log(`✗ Error inesperado: ${err.message}`, '#f87171');
+        btn.disabled = false; btn.textContent = 'Aplicar cambios';
+      }
+    });
+  </script>
+</body>
+</html>
