@@ -323,7 +323,7 @@ body {
 
 /* Category heading (BEBIDAS / COMIDA) */
 .category-heading {
-  margin-top: 2.5rem;
+  margin-top: 0;
 }
 .cat-title {
   font-family: 'SaiyanSans', cursive;
@@ -353,35 +353,89 @@ body {
   line-height: 1;
 }
 
-/* Last category gets bottom safe-area padding */
-.category-block:last-child {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+/* El padding inferior va dentro de la última sección para que el color la cubra */
+.category-block:last-child { padding-bottom: 0; }
+.category-block:last-child .menu-section:last-child {
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
 }
 
 /* Menu section */
-.menu-section { }
+.menu-section { margin-bottom: 0; }
 .section-header {
-  padding: 1.25rem 1.25rem 0.75rem;
+  padding: 0.75rem 1.25rem;
   position: relative;
-  padding-left: 1.5rem;
 }
-.section-header::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.75rem;
-  bottom: 0.75rem;
-  width: 4px;
-  background: var(--rainbow);
-  border-radius: 2px;
-}
+.section-header::before { display: none; }
 .section-name {
   font-family: 'FreeRansomNotes', cursive;
-  font-size: 2rem;
+  font-size: 2.9rem;
   letter-spacing: 3px;
-  color: var(--text);
+  color: #fff;
   line-height: 1.1;
 }
+
+/* ── Colores por sección (bandera LGBT+) ─────────────── */
+
+/* BEBIDAS */
+.section--tragos         { background: #E40303; }
+.section--aperitivos     { background: #FF8C00; }
+.section--cervezas-lata  { background: #FFED00; }
+.section--cervezas-litro { background: #008026; }
+.section--vinos          { background: #4169E1; }
+.section--sin-alcohol    { background: #750787; }
+
+/* COMIDA */
+.section--comida         { background: #008026; }
+
+/* Texto para fondos OSCUROS (rojo, azul, violeta, verde) → blanco */
+.section--tragos         .section-desc,
+.section--cervezas-litro .section-desc,
+.section--vinos          .section-desc,
+.section--sin-alcohol    .section-desc,
+.section--comida         .section-desc { color: rgba(255,255,255,0.8); }
+
+.section--tragos         .item-name,
+.section--cervezas-litro .item-name,
+.section--vinos          .item-name,
+.section--sin-alcohol    .item-name,
+.section--comida         .item-name { color: #fff; }
+
+.section--tragos         .item-desc,
+.section--cervezas-litro .item-desc,
+.section--vinos          .item-desc,
+.section--sin-alcohol    .item-desc,
+.section--comida         .item-desc { color: rgba(255,255,255,0.7); }
+
+.section--tragos         .item-price,
+.section--cervezas-litro .item-price,
+.section--vinos          .item-price,
+.section--sin-alcohol    .item-price,
+.section--comida         .item-price { color: #FFED00; }
+
+.section--tragos         .subsection-name,
+.section--cervezas-litro .subsection-name,
+.section--vinos          .subsection-name,
+.section--sin-alcohol    .subsection-name,
+.section--comida         .subsection-name { color: rgba(255,255,255,0.5); }
+
+/* Texto para fondos CLAROS (naranja, amarillo) → oscuro */
+.section--aperitivos    .section-name,
+.section--cervezas-lata .section-name { color: #1a0a00; }
+
+.section--aperitivos    .section-desc,
+.section--cervezas-lata .section-desc { color: rgba(0,0,0,0.6); }
+
+.section--aperitivos    .item-name,
+.section--cervezas-lata .item-name { color: #1a0a00; }
+
+.section--aperitivos    .item-desc,
+.section--cervezas-lata .item-desc { color: rgba(0,0,0,0.6); }
+
+.section--aperitivos    .item-price,
+.section--cervezas-lata .item-price { color: #5a2d00; }
+
+.section--aperitivos    .subsection-name,
+.section--cervezas-lata .subsection-name { color: rgba(0,0,0,0.45); }
 .section-desc {
   font-size: 0.78rem;
   color: var(--muted);
@@ -405,8 +459,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8rem 1.25rem;
-  border-top: 1px solid #1a1a1a;
+  padding: 0.9rem 1.25rem;
+  border-top: none;
   gap: 0.75rem;
 }
 .item-info {
@@ -416,24 +470,23 @@ body {
   min-width: 0;
 }
 .item-name {
-  font-size: 0.93rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--text);
   line-height: 1.3;
 }
 .item-desc {
-  font-size: 0.73rem;
+  font-size: 0.72rem;
   color: var(--muted);
   margin-top: 0.1rem;
 }
 .item-price {
   font-weight: 800;
-  font-size: 0.85rem;
-  color: var(--text);
-  background: #1e1e1e;
-  border: 1px solid var(--border);
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #f048b0;
+  background: none;
+  border: none;
+  padding: 0;
   white-space: nowrap;
   flex-shrink: 0;
 }
