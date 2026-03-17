@@ -390,6 +390,39 @@ body {
   line-height: 1;
 }
 
+.comida-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.35rem 1.25rem 0.9rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  background-color: #f048b0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  flex-wrap: wrap;
+}
+.comida-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.comida-legend .legend-sep {
+  opacity: 0.6;
+}
+.comida-legend .vegan-badge {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.comida-legend .sin-tacc-badge {
+  width: 18px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 /* El padding inferior va dentro de la última sección para que el color la cubra */
 .category-block:last-child { padding-bottom: 0; }
 .category-block:last-child .menu-section:last-child {
