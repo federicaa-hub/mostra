@@ -18,10 +18,11 @@ import {
 
 // ── State ────────────────────────────────────────────────────────────────────
 
-let allItems    = [];
-let sections    = [];
-let unsubItems  = null;
-let filters     = { sectionId: '', available: 'all', search: '' };
+let allItems       = [];
+let sections       = [];
+let unsubItems     = null;
+let filters        = { sectionId: '', available: 'all', search: '' };
+let skipNextRender = false;
 
 const ADMIN_EMAIL = 'barra@mostra.admin';
 
@@ -98,6 +99,7 @@ async function loadData() {
     query(collection(db, 'items')),
     snapshot => {
       allItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (skipNextRender) { skipNextRender = false; return; }
       renderList();
       renderPromoSections();
     },
@@ -355,16 +357,34 @@ function startEditPrice(id, currentPrice, displayEl) {
 
 // ── Delete ────────────────────────────────────────────────────────────────────
 
-async function doDelete(item) {
-  if (!confirm(`¿Eliminar "${item.name}"?\nEsta acción no se puede deshacer.`)) return;
+let pendingDeleteItem = null;
+
+function doDelete(item) {
+  pendingDeleteItem = item;
+  document.getElementById('delete-confirm-name').textContent = item.name;
+  document.getElementById('delete-confirm-modal').classList.remove('hidden');
+}
+
+document.getElementById('delete-cancel-btn').addEventListener('click', () => {
+  document.getElementById('delete-confirm-modal').classList.add('hidden');
+  pendingDeleteItem = null;
+});
+
+document.getElementById('delete-confirm-btn').addEventListener('click', async () => {
+  if (!pendingDeleteItem) return;
+  const btn = document.getElementById('delete-confirm-btn');
+  btn.disabled = true;
   try {
-    await deleteDoc(doc(db, 'items', item.id));
+    await deleteDoc(doc(db, 'items', pendingDeleteItem.id));
+    document.getElementById('delete-confirm-modal').classList.add('hidden');
+    pendingDeleteItem = null;
     showToast('Ítem eliminado');
   } catch (err) {
     console.error(err);
     showToast('Error al eliminar', true);
   }
-}
+  btn.disabled = false;
+});
 
 // ── Add item modal ─────────────────────────────────────────────────────────────
 
@@ -377,13 +397,12 @@ addItemBtn.addEventListener('click', () => {
   populateModalSections();
   addItemForm.reset();
   modal.classList.remove('hidden');
+  modal.style.pointerEvents = 'none';
+  setTimeout(() => { modal.style.pointerEvents = ''; }, 350);
 });
 
 closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
-modal.addEventListener('click', e => {
-  if (e.target === modal) modal.classList.add('hidden');
-});
 
 function populateModalSections() {
   const sel = document.getElementById('new-section');
@@ -555,7 +574,10 @@ function openEditPromo(sec) {
   document.getElementById('edit-promo-price').value  = sec.price       || '';
   document.getElementById('edit-promo-bebida').value = sec.bebida      || '';
   document.getElementById('edit-promo-comida').value = sec.comida      || '';
-  document.getElementById('edit-promo-modal').classList.remove('hidden');
+  const overlay = document.getElementById('edit-promo-modal');
+  overlay.classList.remove('hidden');
+  overlay.style.pointerEvents = 'none';
+  setTimeout(() => { overlay.style.pointerEvents = ''; }, 350);
 }
 
 document.getElementById('close-edit-promo-btn').addEventListener('click', () => {
@@ -563,12 +585,6 @@ document.getElementById('close-edit-promo-btn').addEventListener('click', () => 
   editingPromoId = null;
 });
 
-document.getElementById('edit-promo-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('edit-promo-modal')) {
-    document.getElementById('edit-promo-modal').classList.add('hidden');
-    editingPromoId = null;
-  }
-});
 
 document.getElementById('edit-promo-form').addEventListener('submit', async e => {
   e.preventDefault();
@@ -608,7 +624,10 @@ function openEditItem(item) {
   document.getElementById('edit-item-name').value        = item.name        || '';
   document.getElementById('edit-item-subsection').value  = item.subsection  || '';
   document.getElementById('edit-item-description').value = item.description || '';
-  document.getElementById('edit-item-modal').classList.remove('hidden');
+  const overlay = document.getElementById('edit-item-modal');
+  overlay.classList.remove('hidden');
+  overlay.style.pointerEvents = 'none';
+  setTimeout(() => { overlay.style.pointerEvents = ''; }, 350);
 }
 
 document.getElementById('close-edit-item-btn').addEventListener('click', () => {
@@ -616,37 +635,50 @@ document.getElementById('close-edit-item-btn').addEventListener('click', () => {
   editingItemId = null;
 });
 
-document.getElementById('edit-item-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('edit-item-modal')) {
-    document.getElementById('edit-item-modal').classList.add('hidden');
-    editingItemId = null;
-  }
-});
 
 document.getElementById('edit-item-form').addEventListener('submit', async e => {
   e.preventDefault();
   if (!editingItemId) return;
 
-  const btn = e.target.querySelector('button[type="submit"]');
-  btn.disabled = true;
+  const name        = document.getElementById('edit-item-name').value.trim();
+  if (!name) return;
 
-  const name = document.getElementById('edit-item-name').value.trim();
-  if (!name) { btn.disabled = false; return; }
+  const subsection  = document.getElementById('edit-item-subsection').value.trim()  || null;
+  const description = document.getElementById('edit-item-description').value.trim() || null;
+  const savedId     = editingItemId;
+
+  // Patch allItems locally
+  const idx = allItems.findIndex(i => i.id === savedId);
+  if (idx !== -1) allItems[idx] = { ...allItems[idx], name, subsection, description };
+
+  // Update only the affected DOM element
+  const el = document.querySelector(`[data-id="${savedId}"]`);
+  if (el) {
+    el.querySelector('.admin-item-name').textContent = name;
+    const item     = allItems[idx];
+    const secName  = sections.find(s => s.id === item.sectionId)?.name ?? item.sectionId;
+    const metaParts = [secName];
+    if (subsection)  metaParts.push(subsection);
+    if (description) metaParts.push(description);
+    el.querySelector('.admin-item-meta').textContent = metaParts.join(' · ');
+  }
+
+  // Close modal immediately (optimistic)
+  document.getElementById('edit-item-modal').classList.add('hidden');
+  editingItemId = null;
+
+  // Skip the onSnapshot re-render triggered by our own updateDoc
+  skipNextRender = true;
 
   try {
-    await updateDoc(doc(db, 'items', editingItemId), {
-      name,
-      subsection:  document.getElementById('edit-item-subsection').value.trim()  || null,
-      description: document.getElementById('edit-item-description').value.trim() || null,
-    });
-    document.getElementById('edit-item-modal').classList.add('hidden');
-    editingItemId = null;
+    await updateDoc(doc(db, 'items', savedId), { name, subsection, description });
     showToast('✓ Ítem actualizado');
   } catch (err) {
     console.error(err);
+    skipNextRender = false;
+    renderList(); // revert optimistic update on error
     showToast('Error al guardar', true);
   }
-  btn.disabled = false;
 });
 
 // ── UI helpers ────────────────────────────────────────────────────────────────

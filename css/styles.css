@@ -113,14 +113,12 @@ body {
 .btn-ghost:hover { background: var(--card-bg); color: var(--text); }
 
 .btn-danger {
-  background: transparent;
-  color: #ff4c4c;
-  border: 1px solid #ff4c4c33;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 7px;
+  background: #ff4c4c;
+  color: #fff;
+  border: none;
+  width: 100%;
 }
-.btn-danger:hover { background: #ff4c4c18; }
+.btn-danger:hover:not(:disabled) { background: #e03030; }
 
 .btn-icon {
   background: transparent;
@@ -291,6 +289,23 @@ body {
   margin-top: 1.25rem;
 }
 .modal-actions .btn { flex: 1; }
+.modal-delete-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+.modal-delete-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.modal-delete-warn {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0;
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
