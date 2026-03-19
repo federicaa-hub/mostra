@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="assets/logo.png">
   <title>La Tribu Mostra · Carta</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/styles.css?v=27">
+  <link rel="stylesheet" href="css/styles.css?v=28">
 </head>
 <body>
 
@@ -167,5 +167,16 @@
   <div id="toast" class="toast"></div>
 
   <script type="module" src="js/menu.js?v=6"></script>
+  <script>
+    document.querySelectorAll('.header-cat, .footer-cat').forEach(function(cat) {
+      cat.addEventListener('click', function() {
+        if (cat.classList.contains('cat-jumping')) return;
+        cat.classList.add('cat-jumping');
+        cat.addEventListener('animationend', function() {
+          cat.classList.remove('cat-jumping');
+        }, { once: true });
+      });
+    });
+  </script>
 </body>
 </html>
