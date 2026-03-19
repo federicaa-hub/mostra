@@ -1,6 +1,52 @@
 // ── Search module ─────────────────────────────────────────────────────────────
 // Provides initSearch() + applyFilter(query) for the public menu.
 
+// ── Highlight helpers ─────────────────────────────────────────────────────────
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function buildHighlightedHtml(original, terms) {
+  const lc = original.toLowerCase();
+  const ranges = [];
+  for (const term of terms) {
+    if (!term) continue;
+    let i = 0;
+    while ((i = lc.indexOf(term, i)) !== -1) {
+      ranges.push([i, i + term.length]);
+      i += term.length;
+    }
+  }
+  if (!ranges.length) return escHtml(original);
+
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [[...ranges[0]]];
+  for (let i = 1; i < ranges.length; i++) {
+    const last = merged[merged.length - 1];
+    if (ranges[i][0] <= last[1]) last[1] = Math.max(last[1], ranges[i][1]);
+    else merged.push([...ranges[i]]);
+  }
+
+  let html = '', pos = 0;
+  for (const [s, e] of merged) {
+    html += escHtml(original.slice(pos, s));
+    html += `<mark class="search-hl">${escHtml(original.slice(s, e))}</mark>`;
+    pos = e;
+  }
+  return html + escHtml(original.slice(pos));
+}
+
+function highlightEl(el) {
+  if (!el.dataset.orig) el.dataset.orig = el.textContent;
+  el.innerHTML = buildHighlightedHtml(el.dataset.orig, _terms);
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.item-name, .item-desc').forEach(el => {
+    if (el.dataset.orig !== undefined) el.textContent = el.dataset.orig;
+  });
+}
+
 // Sinónimos y equivalentes en inglés: clave (o prefijo de clave) → término canónico español
 const SYNONYMS = {
   // Informal español
@@ -47,6 +93,8 @@ export function applyFilter(query) {
   const raw = (query || '').trim().toLowerCase();
   _rawQuery = raw;
   _terms    = resolveTerms(raw);
+
+  clearHighlights();
 
   const matchesAny = text => _terms.some(t => text.includes(t));
 
@@ -135,6 +183,17 @@ export function applyFilter(query) {
   });
 
   if (emptyEl) emptyEl.style.display = anyVisible ? 'none' : 'block';
+
+  // ── Highlight matching text in visible items ───────────────────────────────
+  if (_terms.length) {
+    document.querySelectorAll('.menu-item').forEach(item => {
+      if (item.style.display === 'none') return;
+      const nameEl = item.querySelector('.item-name');
+      const descEl = item.querySelector('.item-desc');
+      if (nameEl) highlightEl(nameEl);
+      if (descEl) highlightEl(descEl);
+    });
+  }
 }
 
 // ── UI setup (called once after DOM is ready) ─────────────────────────────────
