@@ -12,6 +12,32 @@ import { t, sectionName, initLang } from './i18n.js';
 // Map of sectionId → section data (real-time)
 const sections = new Map();
 
+// ── Cache (localStorage) ──────────────────────────────────────────────────────
+// Permite render instantáneo en visitas repetidas mientras Firestore sincroniza.
+
+const CACHE_KEY = 'mostra-v1';
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutos
+
+function readCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { ts, sects, items } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) return null;
+    return { sects, items };
+  } catch { return null; }
+}
+
+function writeCache() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      sects: [...sections.values()],
+      items: latestItems
+    }));
+  } catch { /* cuota excedida, ignorar */ }
+}
+
 // ── Initialization ──────────────────────────────────────────────────────────
 
 let latestItems  = null;
@@ -27,6 +53,7 @@ function maybeRender() {
   } else {
     applyFilter(getCurrentQuery());
   }
+  writeCache();
 }
 
 function init() {
@@ -39,6 +66,18 @@ function init() {
     }
   });
 
+  // Render inmediato desde caché si existe — el usuario ve la carta en < 10ms
+  const cached = readCache();
+  if (cached && cached.sects.length > 0 && cached.items.length > 0) {
+    cached.sects.forEach(s => sections.set(s.id, s));
+    latestItems = cached.items;
+    renderMenu(latestItems);
+    hideLoading();
+    initSearch();
+    searchReady = true;
+    // Firestore actualizará en background; no mostramos error si ya hay data
+  }
+
   // Real-time sections (needed so promo availability updates instantly)
   onSnapshot(query(collection(db, 'sections'), orderBy('order')), snap => {
     sections.clear();
@@ -46,7 +85,7 @@ function init() {
     maybeRender();
   }, err => {
     console.error('Error loading sections:', err);
-    showError();
+    if (!searchReady) showError(); // Solo mostrar error si no hay nada en pantalla
   });
 
   // Real-time items (available only — bebidas & comida)
@@ -58,7 +97,7 @@ function init() {
     },
     err => {
       console.error('Error loading items:', err);
-      showError();
+      if (!searchReady) showError(); // Solo mostrar error si no hay nada en pantalla
     }
   );
 }

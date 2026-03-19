@@ -1,5 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ⚠️  COMPLETÁ ESTOS VALORES CON LOS DE TU PROYECTO FIREBASE
@@ -20,5 +24,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const db   = getFirestore(app);
+// Persistent offline cache: sirve datos desde IndexedDB en la segunda visita
+// (carga casi instantánea mientras sincroniza en background con Firestore)
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+});
 export const auth = getAuth(app);
