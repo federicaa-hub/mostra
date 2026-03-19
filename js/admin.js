@@ -18,10 +18,11 @@ import {
 
 // ── State ────────────────────────────────────────────────────────────────────
 
-let allItems    = [];
-let sections    = [];
-let unsubItems  = null;
-let filters     = { sectionId: '', available: 'all', search: '' };
+let allItems       = [];
+let sections       = [];
+let unsubItems     = null;
+let filters        = { sectionId: '', available: 'all', search: '' };
+let skipNextRender = false;
 
 const ADMIN_EMAIL = 'barra@mostra.admin';
 
@@ -98,6 +99,7 @@ async function loadData() {
     query(collection(db, 'items')),
     snapshot => {
       allItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (skipNextRender) { skipNextRender = false; return; }
       renderList();
       renderPromoSections();
     },
@@ -638,26 +640,45 @@ document.getElementById('edit-item-form').addEventListener('submit', async e => 
   e.preventDefault();
   if (!editingItemId) return;
 
-  const btn = e.target.querySelector('button[type="submit"]');
-  btn.disabled = true;
+  const name        = document.getElementById('edit-item-name').value.trim();
+  if (!name) return;
 
-  const name = document.getElementById('edit-item-name').value.trim();
-  if (!name) { btn.disabled = false; return; }
+  const subsection  = document.getElementById('edit-item-subsection').value.trim()  || null;
+  const description = document.getElementById('edit-item-description').value.trim() || null;
+  const savedId     = editingItemId;
+
+  // Patch allItems locally
+  const idx = allItems.findIndex(i => i.id === savedId);
+  if (idx !== -1) allItems[idx] = { ...allItems[idx], name, subsection, description };
+
+  // Update only the affected DOM element
+  const el = document.querySelector(`[data-id="${savedId}"]`);
+  if (el) {
+    el.querySelector('.admin-item-name').textContent = name;
+    const item     = allItems[idx];
+    const secName  = sections.find(s => s.id === item.sectionId)?.name ?? item.sectionId;
+    const metaParts = [secName];
+    if (subsection)  metaParts.push(subsection);
+    if (description) metaParts.push(description);
+    el.querySelector('.admin-item-meta').textContent = metaParts.join(' · ');
+  }
+
+  // Close modal immediately (optimistic)
+  document.getElementById('edit-item-modal').classList.add('hidden');
+  editingItemId = null;
+
+  // Skip the onSnapshot re-render triggered by our own updateDoc
+  skipNextRender = true;
 
   try {
-    await updateDoc(doc(db, 'items', editingItemId), {
-      name,
-      subsection:  document.getElementById('edit-item-subsection').value.trim()  || null,
-      description: document.getElementById('edit-item-description').value.trim() || null,
-    });
-    document.getElementById('edit-item-modal').classList.add('hidden');
-    editingItemId = null;
+    await updateDoc(doc(db, 'items', savedId), { name, subsection, description });
     showToast('✓ Ítem actualizado');
   } catch (err) {
     console.error(err);
+    skipNextRender = false;
+    renderList(); // revert optimistic update on error
     showToast('Error al guardar', true);
   }
-  btn.disabled = false;
 });
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
