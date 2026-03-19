@@ -67,10 +67,17 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 
   try {
     await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
-  } catch {
-    errEl.textContent = 'Contraseña incorrecta.';
-    btn.disabled      = false;
-    btn.textContent   = 'Entrar';
+  } catch (err) {
+    console.error('[auth]', err.code, err.message);
+    const msg = (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential')
+      ? 'Contraseña incorrecta.'
+      : err.code === 'auth/too-many-requests'
+        ? 'Demasiados intentos. Intentá más tarde.'
+        : 'Error al iniciar sesión. Revisá la conexión.';
+    errEl.textContent = msg;
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Entrar';
   }
 });
 
@@ -647,6 +654,10 @@ document.getElementById('edit-item-form').addEventListener('submit', async e => 
 function showLogin() {
   document.getElementById('login-wrap').style.display  = 'flex';
   document.getElementById('admin-wrap').classList.remove('visible');
+  const btn = document.getElementById('login-btn');
+  btn.disabled    = false;
+  btn.textContent = 'Entrar';
+  document.getElementById('login-error').textContent = '';
 }
 
 function showPanel() {
