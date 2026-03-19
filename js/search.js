@@ -108,7 +108,8 @@ export function applyFilter(query) {
         let subHasMatch = false;
         sub.querySelectorAll('.menu-item').forEach(item => {
           const name = item.querySelector('.item-name')?.textContent?.toLowerCase() ?? '';
-          const hit = matchesAny(name);
+          const desc = item.querySelector('.item-desc')?.textContent?.toLowerCase() ?? '';
+          const hit = matchesAny(name) || matchesAny(desc);
           item.style.display = hit ? '' : 'none';
           if (hit) subHasMatch = true;
         });
@@ -119,7 +120,8 @@ export function applyFilter(query) {
       // Items directly in section (no subsection)
       section.querySelectorAll(':scope > .menu-item').forEach(item => {
         const name = item.querySelector('.item-name')?.textContent?.toLowerCase() ?? '';
-        const hit = matchesAny(name);
+        const desc = item.querySelector('.item-desc')?.textContent?.toLowerCase() ?? '';
+        const hit = matchesAny(name) || matchesAny(desc);
         item.style.display = hit ? '' : 'none';
         if (hit) sectionHasMatch = true;
       });
