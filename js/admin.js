@@ -355,16 +355,34 @@ function startEditPrice(id, currentPrice, displayEl) {
 
 // ── Delete ────────────────────────────────────────────────────────────────────
 
-async function doDelete(item) {
-  if (!confirm(`¿Eliminar "${item.name}"?\nEsta acción no se puede deshacer.`)) return;
+let pendingDeleteItem = null;
+
+function doDelete(item) {
+  pendingDeleteItem = item;
+  document.getElementById('delete-confirm-name').textContent = item.name;
+  document.getElementById('delete-confirm-modal').classList.remove('hidden');
+}
+
+document.getElementById('delete-cancel-btn').addEventListener('click', () => {
+  document.getElementById('delete-confirm-modal').classList.add('hidden');
+  pendingDeleteItem = null;
+});
+
+document.getElementById('delete-confirm-btn').addEventListener('click', async () => {
+  if (!pendingDeleteItem) return;
+  const btn = document.getElementById('delete-confirm-btn');
+  btn.disabled = true;
   try {
-    await deleteDoc(doc(db, 'items', item.id));
+    await deleteDoc(doc(db, 'items', pendingDeleteItem.id));
+    document.getElementById('delete-confirm-modal').classList.add('hidden');
+    pendingDeleteItem = null;
     showToast('Ítem eliminado');
   } catch (err) {
     console.error(err);
     showToast('Error al eliminar', true);
   }
-}
+  btn.disabled = false;
+});
 
 // ── Add item modal ─────────────────────────────────────────────────────────────
 
@@ -377,15 +395,10 @@ addItemBtn.addEventListener('click', () => {
   populateModalSections();
   addItemForm.reset();
   modal.classList.remove('hidden');
-  modal.style.pointerEvents = 'none';
-  setTimeout(() => { modal.style.pointerEvents = ''; }, 350);
 });
 
 closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
-modal.addEventListener('click', e => {
-  if (e.target === modal) modal.classList.add('hidden');
-});
 
 function populateModalSections() {
   const sel = document.getElementById('new-section');
@@ -557,10 +570,7 @@ function openEditPromo(sec) {
   document.getElementById('edit-promo-price').value  = sec.price       || '';
   document.getElementById('edit-promo-bebida').value = sec.bebida      || '';
   document.getElementById('edit-promo-comida').value = sec.comida      || '';
-  const overlay = document.getElementById('edit-promo-modal');
-  overlay.classList.remove('hidden');
-  overlay.style.pointerEvents = 'none';
-  setTimeout(() => { overlay.style.pointerEvents = ''; }, 350);
+  document.getElementById('edit-promo-modal').classList.remove('hidden');
 }
 
 document.getElementById('close-edit-promo-btn').addEventListener('click', () => {
@@ -568,12 +578,6 @@ document.getElementById('close-edit-promo-btn').addEventListener('click', () => 
   editingPromoId = null;
 });
 
-document.getElementById('edit-promo-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('edit-promo-modal')) {
-    document.getElementById('edit-promo-modal').classList.add('hidden');
-    editingPromoId = null;
-  }
-});
 
 document.getElementById('edit-promo-form').addEventListener('submit', async e => {
   e.preventDefault();
@@ -613,10 +617,7 @@ function openEditItem(item) {
   document.getElementById('edit-item-name').value        = item.name        || '';
   document.getElementById('edit-item-subsection').value  = item.subsection  || '';
   document.getElementById('edit-item-description').value = item.description || '';
-  const overlay = document.getElementById('edit-item-modal');
-  overlay.classList.remove('hidden');
-  overlay.style.pointerEvents = 'none';
-  setTimeout(() => { overlay.style.pointerEvents = ''; }, 350);
+  document.getElementById('edit-item-modal').classList.remove('hidden');
 }
 
 document.getElementById('close-edit-item-btn').addEventListener('click', () => {
@@ -624,12 +625,6 @@ document.getElementById('close-edit-item-btn').addEventListener('click', () => {
   editingItemId = null;
 });
 
-document.getElementById('edit-item-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('edit-item-modal')) {
-    document.getElementById('edit-item-modal').classList.add('hidden');
-    editingItemId = null;
-  }
-});
 
 document.getElementById('edit-item-form').addEventListener('submit', async e => {
   e.preventDefault();

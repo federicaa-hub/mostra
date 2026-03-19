@@ -278,6 +278,19 @@
   <!-- Toast -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/admin.js?v=8"></script>
+  <!-- ── Delete confirmation modal ────────────────────────── -->
+  <div id="delete-confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width:360px;text-align:center">
+      <p class="modal-delete-title">¿Eliminar ítem?</p>
+      <p id="delete-confirm-name" class="modal-delete-name"></p>
+      <p class="modal-delete-warn">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button type="button" id="delete-cancel-btn" class="btn btn-ghost">Cancelar</button>
+        <button type="button" id="delete-confirm-btn" class="btn btn-danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js?v=9"></script>
 </body>
 </html>
