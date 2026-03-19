@@ -1177,6 +1177,15 @@ body {
 }
 .search-close:hover { color: #fff; }
 
+/* Highlight de coincidencias en la búsqueda */
+mark.search-hl {
+  background: #FF8C00;
+  color: #0a0a0a;
+  border-radius: 2px;
+  padding: 0 1px;
+  font: inherit;
+}
+
 /* "No se encuentra" message */
 .search-empty {
   font-family: 'Nunito', sans-serif;
