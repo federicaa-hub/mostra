@@ -1,21 +1,54 @@
 // ── Search module ─────────────────────────────────────────────────────────────
 // Provides initSearch() + applyFilter(query) for the public menu.
 
-// Sinónimos: lo que escribe el usuario → término real a buscar
+// Sinónimos y equivalentes en inglés: clave (o prefijo de clave) → término canónico español
 const SYNONYMS = {
-  'birra':    'cerveza',
-  'birras':   'cerveza',
+  // Informal español
+  'birra':      'cerveza',
+  'birras':     'cerveza',
+  // Inglés → español
+  'beer':       'cerveza',
+  'beers':      'cerveza',
+  'wine':       'vino',
+  'wines':      'vino',
+  'cocktail':   'trago',
+  'cocktails':  'trago',
+  'drink':      'bebida',
+  'drinks':     'bebida',
+  'food':       'comida',
+  'toast':      'tostón',
+  'toasts':     'tostón',
+  'dessert':    'postre',
+  'desserts':   'postre',
+  'appetizer':  'aperitivo',
+  'appetizers': 'aperitivo',
+  'non-alcoholic': 'sin alcohol',
 };
 
-let _query = '';
+// Devuelve el array de términos a buscar: el texto literal más cualquier
+// sinónimo cuya clave empiece con lo escrito (prefijo).
+function resolveTerms(raw) {
+  if (!raw) return [];
+  const terms = new Set([raw]);
+  for (const [key, val] of Object.entries(SYNONYMS)) {
+    if (key.startsWith(raw)) terms.add(val);
+  }
+  return [...terms];
+}
+
+let _rawQuery = '';
+let _terms    = [];
 
 export function getCurrentQuery() {
-  return _query;
+  return _rawQuery;
 }
 
 export function applyFilter(query) {
   const raw = (query || '').trim().toLowerCase();
-  _query = SYNONYMS[raw] ?? raw;
+  _rawQuery = raw;
+  _terms    = resolveTerms(raw);
+
+  const matchesAny = text => _terms.some(t => text.includes(t));
 
   // ── Reset all visibility ──────────────────────────────────────────────────
   document.querySelectorAll(
@@ -24,7 +57,7 @@ export function applyFilter(query) {
 
   const emptyEl = document.getElementById('search-empty');
 
-  if (!_query) {
+  if (!_rawQuery) {
     if (emptyEl) emptyEl.style.display = 'none';
     return;
   }
@@ -35,7 +68,7 @@ export function applyFilter(query) {
   document.querySelectorAll('.category-block').forEach(block => {
     // Cat-title match (ej: "Bebidas", "Comida") → show entire block as-is
     const catTitle = block.querySelector('.cat-title')?.textContent?.toLowerCase() ?? '';
-    if (catTitle.includes(_query)) {
+    if (matchesAny(catTitle)) {
       anyVisible = true;
       return; // children already visible from reset
     }
@@ -45,7 +78,7 @@ export function applyFilter(query) {
     block.querySelectorAll('.menu-section').forEach(section => {
       // Section name match (ej: "Tragos", "Aperitivos") → show entire section
       const sectionName = section.querySelector('.section-name')?.textContent?.toLowerCase() ?? '';
-      if (sectionName.includes(_query)) {
+      if (matchesAny(sectionName)) {
         blockHasMatch = true;
         return; // section + children already visible from reset
       }
@@ -58,15 +91,15 @@ export function applyFilter(query) {
         const soloEl = sub.querySelector('.subsection-name--solo');
         if (soloEl) {
           const name = soloEl.querySelector('span')?.textContent?.toLowerCase() ?? '';
-          const matches = name.includes(_query);
-          sub.style.display = matches ? '' : 'none';
-          if (matches) sectionHasMatch = true;
+          const hit = matchesAny(name);
+          sub.style.display = hit ? '' : 'none';
+          if (hit) sectionHasMatch = true;
           return;
         }
 
         // Regular subsection: label match → show all items inside
         const subLabel = sub.querySelector('.subsection-name')?.textContent?.toLowerCase() ?? '';
-        if (subLabel.includes(_query)) {
+        if (matchesAny(subLabel)) {
           sectionHasMatch = true;
           return; // subsection + items already visible from reset
         }
@@ -75,9 +108,9 @@ export function applyFilter(query) {
         let subHasMatch = false;
         sub.querySelectorAll('.menu-item').forEach(item => {
           const name = item.querySelector('.item-name')?.textContent?.toLowerCase() ?? '';
-          const matches = name.includes(_query);
-          item.style.display = matches ? '' : 'none';
-          if (matches) subHasMatch = true;
+          const hit = matchesAny(name);
+          item.style.display = hit ? '' : 'none';
+          if (hit) subHasMatch = true;
         });
         sub.style.display = subHasMatch ? '' : 'none';
         if (subHasMatch) sectionHasMatch = true;
@@ -86,9 +119,9 @@ export function applyFilter(query) {
       // Items directly in section (no subsection)
       section.querySelectorAll(':scope > .menu-item').forEach(item => {
         const name = item.querySelector('.item-name')?.textContent?.toLowerCase() ?? '';
-        const matches = name.includes(_query);
-        item.style.display = matches ? '' : 'none';
-        if (matches) sectionHasMatch = true;
+        const hit = matchesAny(name);
+        item.style.display = hit ? '' : 'none';
+        if (hit) sectionHasMatch = true;
       });
 
       section.style.display = sectionHasMatch ? '' : 'none';
