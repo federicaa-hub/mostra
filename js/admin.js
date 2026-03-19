@@ -377,6 +377,8 @@ addItemBtn.addEventListener('click', () => {
   populateModalSections();
   addItemForm.reset();
   modal.classList.remove('hidden');
+  modal.style.pointerEvents = 'none';
+  setTimeout(() => { modal.style.pointerEvents = ''; }, 350);
 });
 
 closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
@@ -555,7 +557,10 @@ function openEditPromo(sec) {
   document.getElementById('edit-promo-price').value  = sec.price       || '';
   document.getElementById('edit-promo-bebida').value = sec.bebida      || '';
   document.getElementById('edit-promo-comida').value = sec.comida      || '';
-  document.getElementById('edit-promo-modal').classList.remove('hidden');
+  const overlay = document.getElementById('edit-promo-modal');
+  overlay.classList.remove('hidden');
+  overlay.style.pointerEvents = 'none';
+  setTimeout(() => { overlay.style.pointerEvents = ''; }, 350);
 }
 
 document.getElementById('close-edit-promo-btn').addEventListener('click', () => {
@@ -608,7 +613,10 @@ function openEditItem(item) {
   document.getElementById('edit-item-name').value        = item.name        || '';
   document.getElementById('edit-item-subsection').value  = item.subsection  || '';
   document.getElementById('edit-item-description').value = item.description || '';
-  document.getElementById('edit-item-modal').classList.remove('hidden');
+  const overlay = document.getElementById('edit-item-modal');
+  overlay.classList.remove('hidden');
+  overlay.style.pointerEvents = 'none';
+  setTimeout(() => { overlay.style.pointerEvents = ''; }, 350);
 }
 
 document.getElementById('close-edit-item-btn').addEventListener('click', () => {
