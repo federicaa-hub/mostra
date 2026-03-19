@@ -6,7 +6,7 @@ import {
   onSnapshot,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { initSearch, applyFilter, getCurrentQuery } from './search.js';
+import { initSearch, applyFilter, getCurrentQuery } from './search.js?v=2';
 import { t, sectionName, initLang } from './i18n.js';
 
 // Map of sectionId → section data (real-time)

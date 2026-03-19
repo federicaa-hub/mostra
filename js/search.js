@@ -42,7 +42,9 @@ function highlightEl(el) {
 }
 
 function clearHighlights() {
-  document.querySelectorAll('.item-name, .item-desc').forEach(el => {
+  document.querySelectorAll(
+    '.item-name, .item-desc, .cat-title, .section-name, .subsection-name, .subsection-name--solo span'
+  ).forEach(el => {
     if (el.dataset.orig !== undefined) el.textContent = el.dataset.orig;
   });
 }
@@ -184,8 +186,28 @@ export function applyFilter(query) {
 
   if (emptyEl) emptyEl.style.display = anyVisible ? 'none' : 'block';
 
-  // ── Highlight matching text in visible items ───────────────────────────────
+  // ── Highlight matching text in all visible elements ───────────────────────
   if (_terms.length) {
+    document.querySelectorAll('.category-block').forEach(block => {
+      if (block.style.display === 'none') return;
+      const el = block.querySelector('.cat-title');
+      if (el) highlightEl(el);
+    });
+
+    document.querySelectorAll('.menu-section').forEach(section => {
+      if (section.style.display === 'none') return;
+      const el = section.querySelector('.section-name');
+      if (el) highlightEl(el);
+    });
+
+    document.querySelectorAll('.subsection').forEach(sub => {
+      if (sub.style.display === 'none') return;
+      const label = sub.querySelector('.subsection-name:not(.subsection-name--solo)');
+      const solo  = sub.querySelector('.subsection-name--solo span');
+      if (label) highlightEl(label);
+      if (solo)  highlightEl(solo);
+    });
+
     document.querySelectorAll('.menu-item').forEach(item => {
       if (item.style.display === 'none') return;
       const nameEl = item.querySelector('.item-name');
