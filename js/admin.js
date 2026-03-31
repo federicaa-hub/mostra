@@ -410,7 +410,25 @@ function populateModalSections() {
   sections.forEach(s => {
     sel.innerHTML += `<option value="${s.id}">${s.name} (${s.category})</option>`;
   });
+  populateSubsectionSelect(sel.value);
 }
+
+function populateSubsectionSelect(sectionId) {
+  const sel = document.getElementById('new-subsection');
+  const unique = [...new Set(
+    allItems
+      .filter(i => i.sectionId === sectionId && i.subsection)
+      .map(i => i.subsection)
+  )].sort();
+  sel.innerHTML = '<option value="">— Sin subsección —</option>';
+  unique.forEach(sub => {
+    sel.innerHTML += `<option value="${sub}">${sub}</option>`;
+  });
+}
+
+document.getElementById('new-section').addEventListener('change', e => {
+  populateSubsectionSelect(e.target.value);
+});
 
 addItemForm.addEventListener('submit', async e => {
   e.preventDefault();
