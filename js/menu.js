@@ -152,7 +152,8 @@ function renderSection(container, section, allItems) {
   if (items.length === 0) return;
 
   const sectionEl = document.createElement('div');
-  sectionEl.className = `menu-section section--${section.id}`;
+  const catClass = section.category ? `category--${section.category.toLowerCase()}` : '';
+  sectionEl.className = `menu-section section--${section.id} ${catClass}`.trim();
 
   // Section header
   const headerEl = document.createElement('div');
