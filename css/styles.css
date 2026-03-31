@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: 'HelveticaPunk';
-  src: url('../assets/fonts/Helvetica Punk.ttf') format('truetype');
+  src: url('../assets/fonts/HelveticaPunk.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -483,6 +483,12 @@ body {
   line-height: 1.1;
 }
 .category--promociones .section-name {
+  font-size: 1.5rem;
+  letter-spacing: 1.5px;
+  line-height: 1.2;
+}
+.category--promociones .section-name {
+  font-family: 'HelveticaPunk', cursive;
   font-size: 1.5rem;
   letter-spacing: 1.5px;
   line-height: 1.2;
