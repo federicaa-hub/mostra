@@ -29,8 +29,8 @@
 }
 
 @font-face {
-  font-family: 'HelveticaPunk';
-  src: url('../assets/fonts/HelveticaPunk.ttf') format('truetype');
+  font-family: 'Inspirough';
+  src: url('../assets/fonts/iInspirough.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -488,19 +488,19 @@ body {
   line-height: 1.2;
 }
 .category--promociones .section-name {
-  font-family: 'HelveticaPunk', cursive;
+  font-family: 'Inspirough', cursive;
   font-size: 1.5rem;
   letter-spacing: 1.5px;
   line-height: 1.2;
 }
 .category--promociones .section-name {
-  font-family: 'HelveticaPunk', cursive;
+  font-family: 'Inspirough', cursive;
   font-size: 1.5rem;
   letter-spacing: 1.5px;
   line-height: 1.2;
 }
 .category--promociones .section-name {
-  font-family: 'HelveticaPunk', cursive;
+  font-family: 'Inspirough', cursive;
   font-size: 1.5rem;
   letter-spacing: 1.5px;
   line-height: 1.2;
@@ -1396,7 +1396,7 @@ textarea.form-input {
   margin-bottom: 0.2rem;
 }
 .promo-title {
-  font-family: 'HelveticaPunk', cursive;
+  font-family: 'Inspirough', cursive;
   font-size: clamp(1.4rem, 5vw, 1.9rem);
   color: #fff;
   line-height: 1.1;
