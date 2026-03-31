@@ -193,23 +193,25 @@ function renderList() {
       hdr.querySelector('.section-add-btn').addEventListener('click', () => openAddItemForSection(sectionId));
       container.appendChild(hdr);
 
-      // Group by subsection (preserving first-appearance order, avoid duplicate headers)
-      const subGroups = new Map();
+      // Group by subsection — key normalizado (case-insensitive) para evitar duplicados visuales
+      const subGroups = new Map(); // key normalizado → { label, items[] }
       const subOrder  = [];
       sectionItems.forEach(item => {
-        const key = item.subsection ?? '';
-        if (!subGroups.has(key)) { subGroups.set(key, []); subOrder.push(key); }
-        subGroups.get(key).push(item);
+        const raw = item.subsection?.trim() ?? '';
+        const key = raw.toLowerCase();
+        if (!subGroups.has(key)) { subGroups.set(key, { label: raw, items: [] }); subOrder.push(key); }
+        subGroups.get(key).items.push(item);
       });
 
       subOrder.forEach(key => {
-        if (key) {
+        const { label, items } = subGroups.get(key);
+        if (label) {
           const subHdr = document.createElement('div');
           subHdr.className   = 'admin-subsection-title';
-          subHdr.textContent = key;
+          subHdr.textContent = label;
           container.appendChild(subHdr);
         }
-        subGroups.get(key).forEach(item => container.appendChild(makeAdminItemEl(item)));
+        items.forEach(item => container.appendChild(makeAdminItemEl(item)));
       });
     });
 }
@@ -420,12 +422,17 @@ function populateModalSections() {
 }
 
 function populateSubsectionSelect(sectionId) {
-  const sel = document.getElementById('new-subsection');
-  const unique = [...new Set(
-    allItems
-      .filter(i => i.sectionId === sectionId && i.subsection)
-      .map(i => i.subsection)
-  )].sort();
+  const sel  = document.getElementById('new-subsection');
+  const seen = new Set();
+  const unique = [];
+  allItems
+    .filter(i => i.sectionId === sectionId && i.subsection)
+    .map(i => i.subsection.trim())
+    .sort()
+    .forEach(sub => {
+      const key = sub.toLowerCase();
+      if (!seen.has(key)) { seen.add(key); unique.push(sub); }
+    });
   sel.innerHTML = '<option value="">— Sin subsección —</option>';
   unique.forEach(sub => {
     sel.innerHTML += `<option value="${sub}">${sub}</option>`;
