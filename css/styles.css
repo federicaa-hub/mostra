@@ -5,6 +5,7 @@
   src: url('../assets/fonts/FreeRansomNotes.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -12,6 +13,7 @@
   src: url('../assets/fonts/BohoDisplayRegular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -19,6 +21,7 @@
   src: url('../assets/fonts/Carton.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -26,6 +29,7 @@
   src: url('../assets/fonts/Saiyan-Sans.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -33,6 +37,7 @@
   src: url('../assets/fonts/iInspirough.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 /* ========================
