@@ -473,6 +473,7 @@ addItemForm.addEventListener('submit', async e => {
   } catch (err) {
     console.error(err);
     showToast('Error al agregar ítem', true);
+  } finally {
     submitBtn.disabled = false;
   }
 });
