@@ -220,6 +220,7 @@ function makeAdminItemEl(item) {
   const el = document.createElement('div');
   el.className = `admin-item${item.available ? '' : ' unavailable'}`;
   el.dataset.id = item.id;
+  el.dataset.sectionId = item.sectionId;
 
   const secName = sections.find(s => s.id === item.sectionId)?.name ?? item.sectionId;
   const metaParts = [secName];
@@ -227,6 +228,7 @@ function makeAdminItemEl(item) {
   if (item.description)  metaParts.push(item.description);
 
   el.innerHTML = `
+    <button class="drag-handle" title="Arrastrar para reordenar" aria-label="Reordenar">⠿</button>
     <label class="toggle">
       <input type="checkbox" ${item.available ? 'checked' : ''}>
       <span class="toggle-slider"></span>
@@ -300,7 +302,129 @@ function makeAdminItemEl(item) {
   // Delete
   el.querySelector('.delete-btn').addEventListener('click', () => doDelete(item));
 
+  // Drag handle
+  attachDragHandle(el.querySelector('.drag-handle'), item);
+
   return el;
+}
+
+// ── Drag to reorder ───────────────────────────────────────────────────────────
+
+let dragState = null; // { item, el, ghost, pointerId }
+
+function attachDragHandle(handle, item) {
+  handle.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const el    = handle.closest('.admin-item');
+    const rect  = el.getBoundingClientRect();
+
+    // Ghost (clone following the pointer)
+    const ghost = el.cloneNode(true);
+    Object.assign(ghost.style, {
+      position:      'fixed',
+      left:          rect.left + 'px',
+      top:           rect.top  + 'px',
+      width:         rect.width + 'px',
+      zIndex:        '999',
+      pointerEvents: 'none',
+      opacity:       '0.85',
+      boxShadow:     '0 8px 24px rgba(0,0,0,0.7)',
+      transform:     'scale(1.02)',
+      transition:    'none',
+    });
+    document.body.appendChild(ghost);
+    el.classList.add('drag-origin');
+
+    dragState = { item, el, ghost, offsetY: e.clientY - rect.top, pointerId: e.pointerId };
+
+    handle.setPointerCapture(e.pointerId);
+    handle.addEventListener('pointermove', onDragMove);
+    handle.addEventListener('pointerup',   onDragEnd);
+    handle.addEventListener('pointercancel', onDragEnd);
+  });
+}
+
+function onDragMove(e) {
+  if (!dragState) return;
+  e.preventDefault();
+  const { ghost, offsetY, item } = dragState;
+
+  // Move ghost
+  ghost.style.top = (e.clientY - offsetY) + 'px';
+
+  // Find item under pointer (hide ghost temporarily)
+  ghost.style.visibility = 'hidden';
+  const under = document.elementsFromPoint(e.clientX, e.clientY)
+    .find(el => el.classList.contains('admin-item') && el !== dragState.el);
+  ghost.style.visibility = '';
+
+  // Clear indicators
+  document.querySelectorAll('.drag-over-top, .drag-over-bottom')
+    .forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom'));
+
+  if (under && under.dataset.sectionId === item.sectionId) {
+    const mid = under.getBoundingClientRect().top + under.getBoundingClientRect().height / 2;
+    under.classList.add(e.clientY < mid ? 'drag-over-top' : 'drag-over-bottom');
+    dragState.dropTarget = { el: under, before: e.clientY < mid };
+  } else {
+    dragState.dropTarget = null;
+  }
+}
+
+async function onDragEnd(e) {
+  if (!dragState) return;
+  const handle = e.currentTarget;
+  handle.removeEventListener('pointermove', onDragMove);
+  handle.removeEventListener('pointerup',   onDragEnd);
+  handle.removeEventListener('pointercancel', onDragEnd);
+
+  const { item, el, ghost, dropTarget } = dragState;
+  dragState = null;
+
+  // Cleanup visuals
+  ghost.remove();
+  el.classList.remove('drag-origin');
+  document.querySelectorAll('.drag-over-top, .drag-over-bottom')
+    .forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom'));
+
+  if (!dropTarget) return;
+
+  const targetItem = allItems.find(i => i.id === dropTarget.el.dataset.id);
+  if (!targetItem || targetItem.sectionId !== item.sectionId) return;
+
+  // Build new order for section
+  const sorted = allItems
+    .filter(i => i.sectionId === item.sectionId)
+    .sort((a, b) => a.order - b.order);
+
+  const without = sorted.filter(i => i.id !== item.id);
+  const targetIdx = without.findIndex(i => i.id === targetItem.id);
+  const insertAt  = dropTarget.before ? targetIdx : targetIdx + 1;
+  without.splice(insertAt, 0, item);
+
+  const updates = without.map((i, idx) => ({ id: i.id, order: (idx + 1) * 10 }));
+
+  // Optimistic local update
+  skipNextRender = true;
+  updates.forEach(({ id, order }) => {
+    const local = allItems.find(i => i.id === id);
+    if (local) local.order = order;
+  });
+  renderList();
+
+  try {
+    await Promise.all(updates.map(({ id, order }) =>
+      updateDoc(doc(db, 'items', id), { order })
+    ));
+    showToast('✓ Orden guardado');
+  } catch (err) {
+    console.error(err);
+    skipNextRender = false;
+    renderList();
+    showToast('Error al guardar orden', true);
+  }
 }
 
 // ── Price inline edit ────────────────────────────────────────────────────────

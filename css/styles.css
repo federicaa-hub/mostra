@@ -941,6 +941,22 @@ body {
   padding: 0.75rem 0.25rem 0.2rem;
 }
 
+.drag-handle {
+  background: none;
+  border: none;
+  color: #444;
+  font-size: 1.1rem;
+  cursor: grab;
+  padding: 0.3rem 0.2rem;
+  flex-shrink: 0;
+  touch-action: none;
+  line-height: 1;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: color 0.15s;
+}
+.drag-handle:active { cursor: grabbing; color: #888; }
+
 .admin-item {
   display: flex;
   align-items: center;
@@ -952,6 +968,9 @@ body {
   margin-bottom: 0.55rem;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
+.admin-item.drag-origin { opacity: 0.35; }
+.admin-item.drag-over-top    { border-top: 2px solid var(--yellow); }
+.admin-item.drag-over-bottom { border-bottom: 2px solid var(--yellow); }
 .admin-item:hover {
   background: #1c1c1c;
   border-color: #303030;
