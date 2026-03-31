@@ -775,10 +775,32 @@ document.getElementById('edit-promo-form').addEventListener('submit', async e =>
 
 let editingItemId = null;
 
+function populateEditSubsectionSelect(sectionId, current) {
+  const sel  = document.getElementById('edit-item-subsection');
+  const seen = new Set();
+  const unique = [];
+  allItems
+    .filter(i => i.sectionId === sectionId && i.subsection)
+    .map(i => i.subsection.trim())
+    .sort()
+    .forEach(sub => {
+      const key = sub.toLowerCase();
+      if (!seen.has(key)) { seen.add(key); unique.push(sub); }
+    });
+  sel.innerHTML = '<option value="">— Sin subsección —</option>';
+  unique.forEach(sub => {
+    sel.innerHTML += `<option value="${sub}"${sub === current ? ' selected' : ''}>${sub}</option>`;
+  });
+  // Si el item tiene una subsección que no existe en otros ítems, agregarla igual
+  if (current && !unique.find(s => s === current)) {
+    sel.innerHTML += `<option value="${current}" selected>${current}</option>`;
+  }
+}
+
 function openEditItem(item) {
   editingItemId = item.id;
   document.getElementById('edit-item-name').value        = item.name        || '';
-  document.getElementById('edit-item-subsection').value  = item.subsection  || '';
+  populateEditSubsectionSelect(item.sectionId, item.subsection || '');
   document.getElementById('edit-item-description').value = item.description || '';
   const overlay = document.getElementById('edit-item-modal');
   overlay.classList.remove('hidden');
