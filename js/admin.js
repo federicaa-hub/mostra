@@ -188,7 +188,9 @@ function renderList() {
       // Section header
       const hdr = document.createElement('div');
       hdr.className = 'admin-section-title';
-      hdr.textContent = section?.name?.toUpperCase() ?? sectionId;
+      const secLabel = section?.name?.toUpperCase() ?? sectionId;
+      hdr.innerHTML = `<span>${secLabel}</span><button class="section-add-btn" title="Agregar ítem a esta sección">+</button>`;
+      hdr.querySelector('.section-add-btn').addEventListener('click', () => openAddItemForSection(sectionId));
       container.appendChild(hdr);
 
       // Group by subsection preserving order
@@ -393,13 +395,19 @@ const addItemBtn   = document.getElementById('add-item-btn');
 const closeModalBtn = document.getElementById('close-modal-btn');
 const addItemForm  = document.getElementById('add-item-form');
 
-addItemBtn.addEventListener('click', () => {
+addItemBtn.addEventListener('click', () => openAddItemForSection());
+
+function openAddItemForSection(sectionId) {
   populateModalSections();
   addItemForm.reset();
+  if (sectionId) {
+    document.getElementById('new-section').value = sectionId;
+    populateSubsectionSelect(sectionId);
+  }
   modal.classList.remove('hidden');
   modal.style.pointerEvents = 'none';
   setTimeout(() => { modal.style.pointerEvents = ''; }, 350);
-});
+}
 
 closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
@@ -410,7 +418,25 @@ function populateModalSections() {
   sections.forEach(s => {
     sel.innerHTML += `<option value="${s.id}">${s.name} (${s.category})</option>`;
   });
+  populateSubsectionSelect(sel.value);
 }
+
+function populateSubsectionSelect(sectionId) {
+  const sel = document.getElementById('new-subsection');
+  const unique = [...new Set(
+    allItems
+      .filter(i => i.sectionId === sectionId && i.subsection)
+      .map(i => i.subsection)
+  )].sort();
+  sel.innerHTML = '<option value="">— Sin subsección —</option>';
+  unique.forEach(sub => {
+    sel.innerHTML += `<option value="${sub}">${sub}</option>`;
+  });
+}
+
+document.getElementById('new-section').addEventListener('change', e => {
+  populateSubsectionSelect(e.target.value);
+});
 
 addItemForm.addEventListener('submit', async e => {
   e.preventDefault();
