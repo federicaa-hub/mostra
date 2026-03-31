@@ -926,7 +926,7 @@ body {
   justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s, border-color 0.15s;
-  font-family: inherit;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 .section-add-btn:hover {
   background: #1e1e1e;
@@ -1428,4 +1428,52 @@ textarea.form-input {
 .footer-credit strong {
   color: var(--text);
   font-weight: 700;
+}
+
+/* ========================
+   MOBILE — admin panel
+   ======================== */
+@media (max-width: 520px) {
+
+  /* Header: búsqueda más compacta */
+  .admin-search-input       { max-width: 100px; }
+  .admin-search-input:focus { max-width: 120px; }
+
+  /* Item: primera fila toggle+nombre+precio, segunda fila acciones */
+  .admin-item {
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    gap: 0.35rem 0.6rem;
+  }
+  .admin-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+    background: transparent;
+    border: none;
+    padding: 0.15rem 0 0;
+    gap: 0.25rem;
+  }
+  .admin-item-actions .btn-icon {
+    padding: 0.5rem 0.6rem;
+    font-size: 1.1rem;
+  }
+  .price-display {
+    font-size: 0.88rem;
+    min-width: 50px;
+    padding: 0.3rem 0.5rem;
+  }
+
+  /* Precio editable: más ancho para el teclado numérico */
+  .price-input { width: 72px; }
+
+  /* Modal: ocupa todo el ancho y queda pegado abajo */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    padding: 1.25rem 1rem 2rem;
+  }
 }
