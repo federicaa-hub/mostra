@@ -4,6 +4,7 @@ import {
   query,
   where,
   onSnapshot,
+  getDocs,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { initSearch, applyFilter, getCurrentQuery } from './search.js?v=2';
@@ -16,7 +17,7 @@ const sections = new Map();
 // Permite render instantáneo en visitas repetidas mientras Firestore sincroniza.
 
 const CACHE_KEY = 'mostra-v1';
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutos
+const CACHE_TTL = 60 * 60 * 1000; // 60 minutos
 
 function readCache() {
   try {
@@ -88,18 +89,16 @@ function init() {
     if (!searchReady) showError(); // Solo mostrar error si no hay nada en pantalla
   });
 
-  // Real-time items (available only — bebidas & comida)
-  onSnapshot(
-    query(collection(db, 'items'), where('available', '==', true)),
-    snapshot => {
+  // Items: getDocs con caché persistente de Firestore (no necesitan tiempo real)
+  getDocs(query(collection(db, 'items'), where('available', '==', true)))
+    .then(snapshot => {
       latestItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       maybeRender();
-    },
-    err => {
+    })
+    .catch(err => {
       console.error('Error loading items:', err);
-      if (!searchReady) showError(); // Solo mostrar error si no hay nada en pantalla
-    }
-  );
+      if (!searchReady) showError();
+    });
 }
 
 // ── Render ───────────────────────────────────────────────────────────────────
