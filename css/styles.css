@@ -1396,7 +1396,7 @@ textarea.form-input {
   margin-bottom: 0.2rem;
 }
 .promo-title {
-  font-family: 'Carton', cursive;
+  font-family: 'HelveticaPunk', cursive;
   font-size: clamp(1.4rem, 5vw, 1.9rem);
   color: #fff;
   line-height: 1.1;
