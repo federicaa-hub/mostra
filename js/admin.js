@@ -193,25 +193,23 @@ function renderList() {
       hdr.querySelector('.section-add-btn').addEventListener('click', () => openAddItemForSection(sectionId));
       container.appendChild(hdr);
 
-      // Group by subsection preserving order
-      let currentSub    = Symbol('init');
-      let currentSubEl  = null;
-
+      // Group by subsection (preserving first-appearance order, avoid duplicate headers)
+      const subGroups = new Map();
+      const subOrder  = [];
       sectionItems.forEach(item => {
-        const sub = item.subsection ?? null;
+        const key = item.subsection ?? '';
+        if (!subGroups.has(key)) { subGroups.set(key, []); subOrder.push(key); }
+        subGroups.get(key).push(item);
+      });
 
-        if (sub !== currentSub) {
-          currentSub = sub;
-          if (sub) {
-            const subHdr = document.createElement('div');
-            subHdr.className    = 'admin-subsection-title';
-            subHdr.textContent  = sub;
-            container.appendChild(subHdr);
-            currentSubEl = null; // items go directly to container after sub header
-          }
+      subOrder.forEach(key => {
+        if (key) {
+          const subHdr = document.createElement('div');
+          subHdr.className   = 'admin-subsection-title';
+          subHdr.textContent = key;
+          container.appendChild(subHdr);
         }
-
-        container.appendChild(makeAdminItemEl(item));
+        subGroups.get(key).forEach(item => container.appendChild(makeAdminItemEl(item)));
       });
     });
 }
