@@ -907,6 +907,30 @@ body {
   padding: 1.4rem 0.25rem 0.5rem;
   border-bottom: 1px solid #1e1e1e;
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-add-btn {
+  background: none;
+  border: 1px solid #333;
+  color: var(--yellow);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.section-add-btn:hover {
+  background: #1e1e1e;
+  border-color: var(--yellow);
 }
 .admin-subsection-title {
   font-size: 0.65rem;
